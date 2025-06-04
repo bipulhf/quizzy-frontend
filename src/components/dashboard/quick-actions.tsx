@@ -1,13 +1,9 @@
+"use client";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import {
-  Upload,
-  FileQuestion,
-  MessageSquare,
-  BarChart3,
-  Users,
-  Settings,
-} from "lucide-react";
+import { Upload, FileQuestion, MessageSquare, BarChart3 } from "lucide-react";
+import Link from "next/link";
 
 const actions = [
   {
@@ -15,14 +11,14 @@ const actions = [
     description: "Add new documents",
     icon: Upload,
     color: "bg-blue-500 hover:bg-blue-600",
-    href: "/dashboard/upload",
+    href: "/dashboard/pdfs?modal=true",
   },
   {
     title: "Create Quiz",
     description: "Generate new quiz",
     icon: FileQuestion,
     color: "bg-green-500 hover:bg-green-600",
-    href: "/dashboard/create-quiz",
+    href: "/dashboard/quizzes/create",
   },
   {
     title: "Chat with PDFs",
@@ -54,7 +50,7 @@ export function QuickActions() {
             className="h-auto p-4 flex flex-col items-center gap-2 hover:shadow-md transition-all"
             asChild
           >
-            <a href={action.href}>
+            <Link href={action.href}>
               <div className={`p-2 rounded-lg text-white ${action.color}`}>
                 <action.icon className="h-5 w-5" />
               </div>
@@ -64,7 +60,7 @@ export function QuickActions() {
                   {action.description}
                 </div>
               </div>
-            </a>
+            </Link>
           </Button>
         ))}
       </CardContent>
