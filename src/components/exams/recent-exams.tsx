@@ -56,29 +56,9 @@ const recentExams = [
     status: "completed",
     difficulty: "Intermediate",
   },
-  {
-    id: 5,
-    title: "React Advanced Concepts",
-    date: "2024-01-05",
-    score: 0,
-    totalQuestions: 22,
-    correctAnswers: 0,
-    timeSpent: "0:00",
-    rank: null,
-    totalParticipants: 28,
-    status: "missed",
-    difficulty: "Advanced",
-  },
 ];
 
 export function RecentExams() {
-  const getScoreColor = (score: number) => {
-    if (score >= 90) return "text-green-600";
-    if (score >= 75) return "text-blue-600";
-    if (score >= 60) return "text-yellow-600";
-    return "text-red-600";
-  };
-
   const getScoreBadgeColor = (score: number) => {
     if (score >= 90) return "bg-green-100 text-green-700";
     if (score >= 75) return "bg-blue-100 text-blue-700";
@@ -97,7 +77,7 @@ export function RecentExams() {
     <Card className="border-0 shadow-md">
       <CardHeader>
         <CardTitle className="text-lg font-semibold">
-          Recent Exam Participation
+          Exam Participation
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
