@@ -14,6 +14,7 @@ import {
   Users,
   BarChart3,
 } from "lucide-react";
+import { CreateQuizAnimation } from "@/components/landing/create-quiz-animation";
 
 export default function LandingPage() {
   return (
@@ -43,29 +44,7 @@ export default function LandingPage() {
                   </Button>
                 </div>
               </div>
-              <div className="relative mx-auto overflow-hidden rounded-xl border bg-background md:aspect-[4/3] lg:aspect-square">
-                <div className="absolute inset-0 bg-gradient-to-br from-primary to-secondary opacity-20"></div>
-                <div className="flex h-full items-center justify-center p-6">
-                  <div className="relative w-full max-w-[80%] rounded-lg border bg-background p-4 shadow-lg">
-                    <div className="flex items-center gap-2 border-b pb-2">
-                      <FileText className="h-5 w-5 text-muted-foreground" />
-                      <span className="text-sm font-medium">
-                        Creating Quiz from "Machine Learning Basics.pdf"
-                      </span>
-                    </div>
-                    <div className="mt-3 space-y-3">
-                      <div className="h-4 w-3/4 rounded-full bg-muted"></div>
-                      <div className="h-4 w-full rounded-full bg-muted"></div>
-                      <div className="h-4 w-5/6 rounded-full bg-muted"></div>
-                    </div>
-                    <div className="mt-4 flex justify-between">
-                      <Button size="sm" className="text-xs">
-                        Generate Quiz
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <CreateQuizAnimation />
             </div>
           </div>
         </section>

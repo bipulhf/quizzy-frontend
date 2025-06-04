@@ -83,11 +83,13 @@ export function ExamRankings() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {rankings.slice(0, 3).map((participant) => (
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+            {rankings.slice(0, 3).map((participant, index) => (
               <div
                 key={participant.rank}
-                className={`text-center p-4 rounded-lg border-2 ${
+                className={`${
+                  index === 0 ? "col-span-2" : ""
+                } text-center p-4 rounded-lg border-2 ${
                   participant.isCurrentUser
                     ? "bg-blue-50 border-blue-300"
                     : getRankColor(participant.rank)

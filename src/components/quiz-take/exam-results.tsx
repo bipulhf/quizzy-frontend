@@ -61,7 +61,7 @@ export function ExamResults() {
       {/* Results Summary */}
       <Card className="border-0 shadow-md bg-gradient-to-r from-blue-50 to-green-50">
         <CardContent className="p-6">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             <div className="text-center">
               <div className="flex items-center justify-center w-16 h-16 bg-blue-100 rounded-full mx-auto mb-2">
                 <Trophy className="h-8 w-8 text-blue-600" />
