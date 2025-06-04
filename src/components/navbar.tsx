@@ -154,16 +154,28 @@ export const Navbar = ({
                 >
                   Dashboard
                 </Link>
-                <Link href="/quizzes" onClick={() => setMobileMenuOpen(false)}>
+                <Link
+                  href="/dashboard/quizzes"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
                   Quizzes
                 </Link>
-                <Link href="/pdfs" onClick={() => setMobileMenuOpen(false)}>
+                <Link
+                  href="/dashboard/pdfs"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
                   PDFs
                 </Link>
-                <Link href="/exams" onClick={() => setMobileMenuOpen(false)}>
+                <Link
+                  href="/dashboard/exams"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
                   Exams
                 </Link>
-                <Link href="/logout" onClick={() => setMobileMenuOpen(false)}>
+                <Link
+                  href="/dashboard/logout"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
                   Logout
                 </Link>
               </>

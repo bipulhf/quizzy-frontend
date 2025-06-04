@@ -1,0 +1,177 @@
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { FileQuestion, Clock, Trophy, Eye, BarChart3 } from "lucide-react";
+
+const recentExams = [
+  {
+    id: 1,
+    title: "Machine Learning Fundamentals",
+    date: "2024-01-15",
+    score: 85,
+    totalQuestions: 20,
+    correctAnswers: 17,
+    timeSpent: "32:45",
+    rank: 3,
+    totalParticipants: 24,
+    status: "completed",
+    difficulty: "Intermediate",
+  },
+  {
+    id: 2,
+    title: "Data Structures Quiz",
+    date: "2024-01-12",
+    score: 92,
+    totalQuestions: 15,
+    correctAnswers: 14,
+    timeSpent: "28:30",
+    rank: 1,
+    totalParticipants: 18,
+    status: "completed",
+    difficulty: "Advanced",
+  },
+  {
+    id: 3,
+    title: "Web Development Basics",
+    date: "2024-01-10",
+    score: 76,
+    totalQuestions: 25,
+    correctAnswers: 19,
+    timeSpent: "45:20",
+    rank: 8,
+    totalParticipants: 32,
+    status: "completed",
+    difficulty: "Beginner",
+  },
+  {
+    id: 4,
+    title: "Database Design Principles",
+    date: "2024-01-08",
+    score: 88,
+    totalQuestions: 18,
+    correctAnswers: 16,
+    timeSpent: "35:15",
+    rank: 2,
+    totalParticipants: 15,
+    status: "completed",
+    difficulty: "Intermediate",
+  },
+  {
+    id: 5,
+    title: "React Advanced Concepts",
+    date: "2024-01-05",
+    score: 0,
+    totalQuestions: 22,
+    correctAnswers: 0,
+    timeSpent: "0:00",
+    rank: null,
+    totalParticipants: 28,
+    status: "missed",
+    difficulty: "Advanced",
+  },
+];
+
+export function RecentExams() {
+  const getScoreColor = (score: number) => {
+    if (score >= 90) return "text-green-600";
+    if (score >= 75) return "text-blue-600";
+    if (score >= 60) return "text-yellow-600";
+    return "text-red-600";
+  };
+
+  const getScoreBadgeColor = (score: number) => {
+    if (score >= 90) return "bg-green-100 text-green-700";
+    if (score >= 75) return "bg-blue-100 text-blue-700";
+    if (score >= 60) return "bg-yellow-100 text-yellow-700";
+    return "bg-red-100 text-red-700";
+  };
+
+  const getRankIcon = (rank: number | null) => {
+    if (!rank) return null;
+    if (rank === 1) return <Trophy className="h-4 w-4 text-yellow-600" />;
+    if (rank <= 3) return <Trophy className="h-4 w-4 text-gray-400" />;
+    return null;
+  };
+
+  return (
+    <Card className="border-0 shadow-md">
+      <CardHeader>
+        <CardTitle className="text-lg font-semibold">
+          Recent Exam Participation
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        {recentExams.map((exam) => (
+          <div
+            key={exam.id}
+            className="flex items-center justify-between p-4 rounded-lg border bg-white hover:shadow-md transition-all duration-200"
+          >
+            <div className="flex items-center gap-4 flex-1">
+              <div className="p-2 bg-blue-100 rounded-lg">
+                <FileQuestion className="h-5 w-5 text-blue-600" />
+              </div>
+
+              <div className="flex-1 space-y-1">
+                <div className="flex items-center gap-2">
+                  <h3 className="font-medium text-gray-900">{exam.title}</h3>
+                  <Badge variant="outline" className="text-xs">
+                    {exam.difficulty}
+                  </Badge>
+                  {exam.status === "missed" && (
+                    <Badge variant="destructive" className="text-xs">
+                      Missed
+                    </Badge>
+                  )}
+                </div>
+
+                <div className="flex items-center gap-4 text-sm text-gray-600">
+                  <span>{exam.date}</span>
+                  {exam.status === "completed" && (
+                    <>
+                      <span>•</span>
+                      <span>
+                        {exam.correctAnswers}/{exam.totalQuestions} correct
+                      </span>
+                      <span>•</span>
+                      <div className="flex items-center gap-1">
+                        <Clock className="h-3 w-3" />
+                        <span>{exam.timeSpent}</span>
+                      </div>
+                      {exam.rank && (
+                        <>
+                          <span>•</span>
+                          <div className="flex items-center gap-1">
+                            {getRankIcon(exam.rank)}
+                            <span>
+                              Rank #{exam.rank}/{exam.totalParticipants}
+                            </span>
+                          </div>
+                        </>
+                      )}
+                    </>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3">
+              {exam.status === "completed" && (
+                <Badge className={getScoreBadgeColor(exam.score)}>
+                  {exam.score}%
+                </Badge>
+              )}
+
+              <Button variant="ghost" size="sm">
+                {exam.status === "completed" ? (
+                  <Eye className="h-4 w-4" />
+                ) : (
+                  <BarChart3 className="h-4 w-4" />
+                )}
+              </Button>
+            </div>
+          </div>
+        ))}
+      </CardContent>
+    </Card>
+  );
+}
