@@ -1,12 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  FileText,
-  FileQuestion,
-  Trophy,
-  Coins,
-  TrendingUp,
-  TrendingDown,
-} from "lucide-react";
+import { FileText, FileQuestion, Trophy, Coins } from "lucide-react";
 
 const stats = [
   {
@@ -65,20 +58,6 @@ export function StatsCards() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-gray-900">{stat.value}</div>
-            <div className="flex items-center gap-1 text-xs text-gray-500 mt-1">
-              {stat.trend === "up" ? (
-                <TrendingUp className="h-3 w-3 text-green-500" />
-              ) : (
-                <TrendingDown className="h-3 w-3 text-red-500" />
-              )}
-              <span
-                className={
-                  stat.trend === "up" ? "text-green-600" : "text-red-600"
-                }
-              >
-                {stat.change}
-              </span>
-            </div>
           </CardContent>
         </Card>
       ))}

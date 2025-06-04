@@ -18,7 +18,7 @@ export const Navbar = ({
   const path = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const isActive = (href: string) => path === href;
+  const isActive = (href: string) => path === href.toLowerCase();
 
   const toggleMobileMenu = () => {
     setMobileMenuOpen(!mobileMenuOpen);
@@ -80,16 +80,24 @@ export const Navbar = ({
           )}
           {isLoggedIn && (
             <div className="flex items-center gap-10 text-sm font-medium">
-              {["/dashboard", "/quizzes", "/pdfs", "/exams"].map((href) => (
+              {[
+                "/dashboard",
+                "/dashboard/quizzes",
+                "/dashboard/PDFs",
+                "/dashboard/exams",
+              ].map((href) => (
                 <Link
                   key={href}
-                  href={href}
+                  href={href.toLowerCase()}
                   className={clsx(
                     "hover:underline underline-offset-4 hover:text-primary transition-all duration-200",
                     isActive(href) && "text-primary font-bold"
                   )}
                 >
-                  {href.slice(1).charAt(0).toUpperCase() + href.slice(2)}
+                  {href === "/dashboard"
+                    ? "Dashboard"
+                    : href.split("/")[2].charAt(0).toUpperCase() +
+                      href.split("/")[2].slice(1)}
                 </Link>
               ))}
               <Link

@@ -16,7 +16,7 @@ export function DashboardHeader() {
       </div>
 
       <div className="flex items-center gap-3">
-        <Button className="bg-blue-600 hover:bg-blue-700">
+        <Button>
           <Plus className="h-4 w-4 mr-2" />
           Create Quiz
         </Button>

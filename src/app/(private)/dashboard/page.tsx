@@ -32,11 +32,11 @@ export default function DashboardPage() {
             {/* Quick Actions */}
             <QuickActions />
 
-            {/* Activity Feed */}
-            <ActivityFeed />
-
             {/* Performance Chart */}
             <PerformanceChart />
+
+            {/* Activity Feed */}
+            <ActivityFeed />
           </div>
         </div>
       </div>
