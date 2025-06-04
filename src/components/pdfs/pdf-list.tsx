@@ -156,10 +156,6 @@ export function PDFList() {
                       Download
                     </DropdownMenuItem>
                     <DropdownMenuItem>
-                      <FileQuestion className="h-4 w-4 mr-2" />
-                      Create Quiz
-                    </DropdownMenuItem>
-                    <DropdownMenuItem>
                       <Edit className="h-4 w-4 mr-2" />
                       Rename
                     </DropdownMenuItem>

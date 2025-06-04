@@ -177,7 +177,7 @@ export function QuizList() {
 
               {/* Right Actions */}
               <div className="flex items-center gap-2">
-                <Button size="sm" className="bg-blue-600 hover:bg-blue-700">
+                <Button size="sm">
                   <Play className="h-4 w-4 mr-2" />
                   Start
                 </Button>
@@ -190,12 +190,12 @@ export function QuizList() {
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-48">
                     <DropdownMenuItem>
-                      <Play className="h-4 w-4 mr-2" />
-                      Start Quiz
-                    </DropdownMenuItem>
-                    <DropdownMenuItem>
                       <Edit className="h-4 w-4 mr-2" />
                       Edit Quiz
+                    </DropdownMenuItem>
+                    <DropdownMenuItem>
+                      <Copy className="h-4 w-4 mr-2" />
+                      Duplicate
                     </DropdownMenuItem>
                     <DropdownMenuItem>
                       <Share2 className="h-4 w-4 mr-2" />
