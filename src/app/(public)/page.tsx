@@ -17,7 +17,7 @@ import {
 
 export default function LandingPage() {
   return (
-    <div className="flex min-h-screen flex-col container mx-auto">
+    <div className="flex min-h-screen flex-col container mx-auto px-5">
       <main className="flex-1">
         {/* Hero Section */}
         <section className="w-full py-12 md:py-24 lg:py-32 xl:py-48">
@@ -25,7 +25,7 @@ export default function LandingPage() {
             <div className="grid gap-6 lg:grid-cols-2 lg:gap-12 items-center">
               <div className="space-y-4">
                 <div className="inline-block rounded-lg bg-muted px-3 py-1 text-sm">
-                  Introducing QuizPDF
+                  Introducing Quizzy
                 </div>
                 <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl lg:text-6xl">
                   Transform PDFs into Interactive Quizzes with AI
@@ -347,7 +347,7 @@ export default function LandingPage() {
                 </h2>
                 <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
                   Join thousands of educators and students who are already using
-                  QuizPDF.
+                  Quizzy.
                 </p>
               </div>
               <div className="w-full max-w-sm space-y-2">
@@ -375,7 +375,7 @@ export default function LandingPage() {
             <div className="space-y-4">
               <div className="flex items-center gap-2">
                 <FileQuestion className="h-6 w-6" />
-                <span className="text-lg font-bold">QuizPDF</span>
+                <span className="text-lg font-bold">Quizzy</span>
               </div>
               <p className="text-sm text-muted-foreground">
                 Transform PDFs into interactive quizzes with AI.
@@ -470,7 +470,7 @@ export default function LandingPage() {
             </div>
           </div>
           <div className="mt-8 border-t pt-8 text-center text-sm text-muted-foreground">
-            © {new Date().getFullYear()} QuizPDF. All rights reserved.
+            © {new Date().getFullYear()} Quizzy. All rights reserved.
           </div>
         </div>
       </footer>
