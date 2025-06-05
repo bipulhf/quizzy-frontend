@@ -106,10 +106,6 @@ export function LiveQuizDemoSection() {
             whileInView={{ opacity: 1, x: 0, rotateY: 0 }}
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 1, ease: "easeOut" }}
-            whileHover={{
-              scale: 1.02,
-              transition: { duration: 0.3 },
-            }}
           >
             <motion.div
               className="absolute inset-0 bg-gradient-to-br from-blue-100 to-blue-500 opacity-10"

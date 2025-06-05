@@ -58,7 +58,6 @@ export function CTASection() {
           >
             <motion.form
               className="flex w-full max-w-sm items-center space-x-2"
-              whileHover={{ scale: 1.02 }}
               transition={{ duration: 0.2 }}
             >
               <motion.div
@@ -73,18 +72,11 @@ export function CTASection() {
                 />
               </motion.div>
               <motion.div
-                whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 transition={{ duration: 0.1 }}
               >
                 <Button type="submit" className="relative overflow-hidden">
-                  <motion.span
-                    initial={{ x: 0 }}
-                    whileHover={{ x: [0, -100, 100, 0] }}
-                    transition={{ duration: 0.6 }}
-                  >
-                    Sign Up
-                  </motion.span>
+                  Sign Up
                 </Button>
               </motion.div>
             </motion.form>

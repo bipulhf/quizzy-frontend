@@ -1,7 +1,5 @@
 "use client";
 
-import type React from "react";
-
 import { useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -15,19 +13,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
-import {
-  FileQuestion,
-  Eye,
-  EyeOff,
-  Mail,
-  Lock,
-  ArrowRight,
-  BookOpen,
-  Users,
-  Trophy,
-} from "lucide-react";
-import Image from "next/image";
+import { Eye, EyeOff, Mail, Lock, ArrowRight } from "lucide-react";
+import LoginVisual from "@/components/auth/login-visual";
 
 export default function SignInPage() {
   const [formData, setFormData] = useState({
@@ -236,65 +223,7 @@ export default function SignInPage() {
       </div>
 
       {/* Right Side - Visual Content (Hidden on mobile) */}
-      <div className="hidden lg:flex flex-col items-center justify-center lg:w-1/2 relative overflow-hidden bg-white">
-        {/* Content */}
-        <div className="relative z-10 flex flex-col justify-center items-center p-12 text-black">
-          <div className="max-w-md text-center space-y-8">
-            {/* Main Heading */}
-            <div className="space-y-4 text-left">
-              <h1 className="text-3xl text-center font-bold leading-tight">
-                Welcome Back to Your Learning Journey
-              </h1>
-              <p className="text-xl text-black">
-                Continue creating amazing quizzes and tracking your progress
-              </p>
-            </div>
-
-            {/* Recent Activity */}
-            <div className="space-y-6 mt-12">
-              <h3 className="text-lg font-semibold text-black">What's New</h3>
-
-              <div className="space-y-4">
-                <div className="flex items-center gap-4 p-4 bg-white/10 backdrop-blur-sm rounded-xl">
-                  <div className="p-2 bg-yellow-primary/30 rounded-lg">
-                    <BookOpen className="h-6 w-6" />
-                  </div>
-                  <div className="text-left">
-                    <h4 className="font-semibold">New AI Features</h4>
-                    <p className="text-sm text-black">
-                      Enhanced question generation
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-4 p-4 bg-white/10 backdrop-blur-sm rounded-xl">
-                  <div className="p-2 bg-yellow-primary/30 rounded-lg">
-                    <Users className="h-6 w-6" />
-                  </div>
-                  <div className="text-left">
-                    <h4 className="font-semibold">Team Collaboration</h4>
-                    <p className="text-sm text-black">
-                      Share quizzes with your team
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-4 p-4 bg-white/10 backdrop-blur-sm rounded-xl">
-                  <div className="p-2 bg-yellow-primary/30 rounded-lg">
-                    <Trophy className="h-6 w-6" />
-                  </div>
-                  <div className="text-left">
-                    <h4 className="font-semibold">Advanced Analytics</h4>
-                    <p className="text-sm text-black">
-                      Detailed performance insights
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+      <LoginVisual />
     </div>
   );
 }

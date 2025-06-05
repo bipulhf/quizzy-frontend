@@ -1,7 +1,5 @@
 "use client";
 
-import type React from "react";
-
 import { useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -15,17 +13,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  FileQuestion,
-  Eye,
-  EyeOff,
-  CheckCircle2,
-  XCircle,
-  BookOpen,
-  Users,
-  Trophy,
-  Zap,
-} from "lucide-react";
+import { Eye, EyeOff, CheckCircle2, XCircle, Zap } from "lucide-react";
+import SignupVisual from "@/components/auth/signup-visual";
 
 interface ValidationState {
   minLength: boolean;
@@ -129,78 +118,7 @@ export default function SignUpPage() {
   return (
     <div className="min-h-screen flex">
       {/* Left Side - Visual Content (Hidden on mobile) */}
-      <div className="hidden lg:flex flex-col items-center justify-center lg:w-1/2 relative overflow-hidden bg-white">
-        {/* Content */}
-        <div className="relative z-10 flex flex-col justify-center items-center p-12 text-black">
-          <div className="max-w-md text-center space-y-8">
-            {/* Main Heading */}
-            <div className="space-y-4">
-              <h1 className="text-3xl font-bold leading-tight">
-                Transform Your PDFs into Interactive Learning
-              </h1>
-              <p className="text-xl text-black">
-                Join thousands of educators and students creating engaging
-                quizzes with AI
-              </p>
-            </div>
-
-            {/* Features */}
-            <div className="space-y-6 mt-12">
-              <div className="flex items-center gap-4 p-4 bg-white/10 backdrop-blur-sm rounded-xl">
-                <div className="p-2 bg-yellow-primary/30 rounded-lg">
-                  <BookOpen className="h-6 w-6" />
-                </div>
-                <div className="text-left">
-                  <h3 className="font-semibold">Smart Quiz Generation</h3>
-                  <p className="text-sm text-black">
-                    AI-powered questions from your PDFs
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-4 p-4 bg-white/10 backdrop-blur-sm rounded-xl">
-                <div className="p-2 bg-yellow-primary/30 rounded-lg">
-                  <Users className="h-6 w-6" />
-                </div>
-                <div className="text-left">
-                  <h3 className="font-semibold">Collaborative Learning</h3>
-                  <p className="text-sm text-black">
-                    Share quizzes and compete with others
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-4 p-4 bg-white/10 backdrop-blur-sm rounded-xl">
-                <div className="p-2 bg-yellow-primary/30 rounded-lg">
-                  <Trophy className="h-6 w-6" />
-                </div>
-                <div className="text-left">
-                  <h3 className="font-semibold">Track Progress</h3>
-                  <p className="text-sm text-black">
-                    Leaderboards and detailed analytics
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Stats */}
-            <div className="grid grid-cols-3 gap-6 mt-12 pt-8 border-t border-white/20">
-              <div className="text-center">
-                <div className="text-2xl font-bold">1K+</div>
-                <div className="text-sm text-black">Active Users</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold">5K+</div>
-                <div className="text-sm text-black">Quizzes Created</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold">98%</div>
-                <div className="text-sm text-black">Satisfaction</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+      <SignupVisual />
 
       {/* Right Side - Form */}
       <div className="w-full lg:w-1/2 flex items-center justify-center p-4 bg-gradient-to-br from-white to-blue-500/5 relative overflow-hidden">
