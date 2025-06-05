@@ -1,12 +1,15 @@
 import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
+import { cookies } from "next/headers";
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const isLoggedIn = false;
+  const cookieStore = await cookies();
+  const isLoggedIn = cookieStore.get("token") ? true : false;
+
   return (
     <div className="">
       <Navbar isLoggedIn={isLoggedIn} />

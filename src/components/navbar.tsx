@@ -5,8 +5,9 @@ import { Button } from "./ui/button";
 import Link from "next/link";
 import Image from "next/image";
 import { LogOutIcon, MenuIcon, XIcon } from "lucide-react";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import clsx from "clsx";
+import { toast } from "sonner";
 
 export const Navbar = ({
   isLoggedIn = false,
@@ -17,7 +18,7 @@ export const Navbar = ({
 }) => {
   const path = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
+  const router = useRouter();
   const isActive = (href: string) => path === href.toLowerCase();
 
   const toggleMobileMenu = () => {
@@ -32,7 +33,7 @@ export const Navbar = ({
         </Link>
 
         {/* Desktop Links */}
-        {showLinks && (
+        {!isLoggedIn && (
           <nav className="hidden md:flex items-center gap-6">
             <Link
               href="/#features"
@@ -100,12 +101,20 @@ export const Navbar = ({
                       href.split("/")[2].slice(1)}
                 </Link>
               ))}
-              <Link
-                href="/logout"
+              <Button
+                variant={"outline"}
+                size={"icon"}
+                onClick={async () => {
+                  await fetch("/api/logout", {
+                    method: "GET",
+                  });
+                  toast.success("Logged out");
+                  router.refresh();
+                }}
                 className="hover:text-primary transition-all duration-200 ml-10"
               >
                 <LogOutIcon className="h-4 w-4" />
-              </Link>
+              </Button>
             </div>
           )}
         </div>
@@ -172,12 +181,19 @@ export const Navbar = ({
                 >
                   Exams
                 </Link>
-                <Link
-                  href="/dashboard/logout"
-                  onClick={() => setMobileMenuOpen(false)}
+                <Button
+                  variant={"outline"}
+                  size={"icon"}
+                  onClick={async () => {
+                    await fetch("/api/logout", {
+                      method: "GET",
+                    });
+                    toast.success("Logged out");
+                    router.refresh();
+                  }}
                 >
                   Logout
-                </Link>
+                </Button>
               </>
             )}
           </div>

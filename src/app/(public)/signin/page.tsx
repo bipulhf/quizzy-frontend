@@ -15,6 +15,9 @@ import {
 } from "@/components/ui/card";
 import { Eye, EyeOff, Mail, Lock, ArrowRight } from "lucide-react";
 import LoginVisual from "@/components/auth/login-visual";
+import { loginAction } from "@/action/auth.action";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 export default function SignInPage() {
   const [formData, setFormData] = useState({
@@ -28,6 +31,7 @@ export default function SignInPage() {
     password: "",
     general: "",
   });
+  const router = useRouter();
 
   const validateEmail = (email: string): boolean => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -79,15 +83,17 @@ export default function SignInPage() {
 
     try {
       // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      const response = await loginAction({
+        email: formData.email,
+        password: formData.password,
+      });
 
-      // Simulate login error for demo (remove in production)
-      if (formData.email === "demo@error.com") {
-        throw new Error("Invalid email or password");
+      if (response.success) {
+        toast.success("Sign in successful");
+        router.push("/");
+      } else {
+        toast.error(response.error);
       }
-
-      // Handle successful login here
-      console.log("Sign in successful:", formData);
     } catch (error) {
       setErrors((prev) => ({
         ...prev,

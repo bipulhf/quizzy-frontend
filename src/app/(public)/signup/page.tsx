@@ -15,6 +15,9 @@ import {
 } from "@/components/ui/card";
 import { Eye, EyeOff, CheckCircle2, XCircle, Zap } from "lucide-react";
 import SignupVisual from "@/components/auth/signup-visual";
+import { registerAction } from "@/action/auth.action";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 interface ValidationState {
   minLength: boolean;
@@ -37,6 +40,7 @@ export default function SignUpPage() {
     isValidEmail: false,
   });
   const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
   const validateEmail = (email: string): boolean => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -86,12 +90,19 @@ export default function SignUpPage() {
     if (!isFormValid()) return;
 
     setIsLoading(true);
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 2000));
+    const response = await registerAction({
+      name: formData.name,
+      email: formData.email,
+      password: formData.password,
+    });
     setIsLoading(false);
 
-    // Handle successful signup here
-    console.log("Sign up successful:", formData);
+    if (response.success) {
+      toast.success("Sign up successful. Please login to continue");
+      router.push("/signin");
+    } else {
+      toast.error(response.error);
+    }
   };
 
   const ValidationItem = ({
