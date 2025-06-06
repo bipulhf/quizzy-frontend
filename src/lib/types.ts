@@ -15,5 +15,22 @@ export type DashboardInfoType = {
   total_quiz: number;
   total_exam_participated: number;
   recent_pdfs: UploadType[];
-  recent_quizzes: any[];
+  recent_quizzes: QuizType[];
+};
+
+export type QuizType = {
+  id: number;
+  name: string;
+  retake: boolean;
+  start_time: string;
+  end_time: string;
+  quiz_type: string;
+  topic: string;
+  start_page: number;
+  end_page: number;
+  participants_count: number;
+  questions_count: number;
+  processing_state: number;
+  created_at: string;
+  quiz_difficulty: string;
 };

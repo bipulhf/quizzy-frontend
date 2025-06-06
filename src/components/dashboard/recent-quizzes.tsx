@@ -5,7 +5,6 @@ import {
   FileQuestion,
   Users,
   MoreHorizontal,
-  Play,
   Share2,
   Edit,
 } from "lucide-react";
@@ -16,61 +15,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import Link from "next/link";
+import { QuizType } from "@/lib/types";
 
-const recentQuizzes = [
-  {
-    id: 1,
-    title: "Machine Learning Basics",
-    type: "Topic-based",
-    questions: 15,
-    participants: 24,
-    createdDate: "2024-01-15",
-    status: "active",
-    avgScore: 78,
-  },
-  {
-    id: 2,
-    title: "Data Structures Quiz",
-    type: "Page Range",
-    questions: 20,
-    participants: 18,
-    createdDate: "2024-01-14",
-    status: "active",
-    avgScore: 82,
-  },
-  {
-    id: 3,
-    title: "Web Dev Fundamentals",
-    type: "Multi-PDF",
-    questions: 12,
-    participants: 31,
-    createdDate: "2024-01-13",
-    status: "completed",
-    avgScore: 75,
-  },
-  {
-    id: 4,
-    title: "Database Design Quiz",
-    type: "Topic-based",
-    questions: 18,
-    participants: 15,
-    createdDate: "2024-01-12",
-    status: "draft",
-    avgScore: null,
-  },
-  {
-    id: 5,
-    title: "Software Engineering",
-    type: "Page Range",
-    questions: 25,
-    participants: 42,
-    createdDate: "2024-01-11",
-    status: "active",
-    avgScore: 88,
-  },
-];
-
-export function RecentQuizzes({ quizzes }: { quizzes: any[] }) {
+export function RecentQuizzes({ quizzes }: { quizzes: QuizType[] }) {
   return (
     <Card className="border-0 shadow-md">
       <CardHeader className="flex flex-row items-center justify-between">
@@ -98,44 +45,40 @@ export function RecentQuizzes({ quizzes }: { quizzes: any[] }) {
                 </div>
                 <div className="space-y-1">
                   <h4 className="font-medium text-gray-900 truncate max-w-[200px] sm:max-w-[300px]">
-                    {quiz.title}
+                    {quiz.name}
                   </h4>
                   <div className="flex items-center gap-4 text-xs text-gray-500">
-                    <span>{quiz.questions} questions</span>
+                    <span>{quiz.questions_count} questions</span>
                     <span className="flex items-center gap-1">
                       <Users className="h-3 w-3" />
-                      {quiz.participants}
+                      {quiz.participants_count}
                     </span>
-                    {quiz.avgScore && (
-                      <span className="text-green-600 font-medium">
-                        {quiz.avgScore}% avg
-                      </span>
-                    )}
                   </div>
-                  <Badge variant="outline" className="text-xs">
-                    {quiz.type}
-                  </Badge>
                 </div>
               </div>
 
               <div className="flex items-center gap-2">
                 <Badge
                   variant={
-                    quiz.status === "active"
+                    quiz.processing_state === 1
                       ? "default"
-                      : quiz.status === "completed"
+                      : quiz.processing_state === 0
                       ? "secondary"
                       : "outline"
                   }
                   className={
-                    quiz.status === "active"
+                    quiz.processing_state === 1
                       ? "bg-green-100 text-green-700"
-                      : quiz.status === "completed"
-                      ? "bg-blue-100 text-blue-700"
+                      : quiz.processing_state === 0
+                      ? "bg-yellow-100 text-yellow-700"
                       : "bg-gray-100 text-gray-700"
                   }
                 >
-                  {quiz.status}
+                  {quiz.processing_state === 1
+                    ? "Active"
+                    : quiz.processing_state === 0
+                    ? "Processing"
+                    : "Draft"}
                 </Badge>
 
                 <DropdownMenu>
@@ -145,10 +88,6 @@ export function RecentQuizzes({ quizzes }: { quizzes: any[] }) {
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
-                    <DropdownMenuItem>
-                      <Play className="h-4 w-4 mr-2" />
-                      Start Quiz
-                    </DropdownMenuItem>
                     <DropdownMenuItem>
                       <Edit className="h-4 w-4 mr-2" />
                       Edit

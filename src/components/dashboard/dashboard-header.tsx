@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
+import Link from "next/link";
 
 export function DashboardHeader() {
   const currentDate = new Date().toLocaleDateString("en-US", {
@@ -16,10 +17,12 @@ export function DashboardHeader() {
       </div>
 
       <div className="flex items-center gap-3">
-        <Button>
-          <Plus className="h-4 w-4 mr-2" />
-          Create Quiz
-        </Button>
+        <Link href="/dashboard/quizzes?create=true">
+          <Button>
+            <Plus className="h-4 w-4 mr-2" />
+            Create Quiz
+          </Button>
+        </Link>
       </div>
     </div>
   );

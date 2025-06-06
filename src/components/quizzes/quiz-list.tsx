@@ -19,85 +19,19 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
+import { QuizType } from "@/lib/types";
+import { formatDateTime } from "@/utils/date";
 
-const quizzes = [
-  {
-    id: 1,
-    title: "Machine Learning Fundamentals",
-    description: "Comprehensive quiz covering basic ML concepts and algorithms",
-    type: "Topic-based",
-    questions: 25,
-    participants: 48,
-    createdDate: "2024-01-15",
-    status: "active",
-    difficulty: "Intermediate",
-    duration: "45 min",
-  },
-  {
-    id: 2,
-    title: "Data Structures Deep Dive",
-    description: "Advanced quiz on data structures and their implementations",
-    type: "Page Range",
-    questions: 30,
-    participants: 32,
-    createdDate: "2024-01-14",
-    status: "active",
-    difficulty: "Advanced",
-    duration: "60 min",
-  },
-  {
-    id: 3,
-    title: "Web Development Basics",
-    description: "Introduction to HTML, CSS, and JavaScript fundamentals",
-    type: "Multi-PDF",
-    questions: 20,
-    participants: 67,
-    createdDate: "2024-01-13",
-    status: "completed",
-    difficulty: "Beginner",
-    duration: "30 min",
-  },
-  {
-    id: 4,
-    title: "Database Design Principles",
-    description:
-      "Quiz covering normalization, relationships, and SQL optimization",
-    type: "Topic-based",
-    questions: 22,
-    participants: 0,
-    createdDate: "2024-01-12",
-    status: "draft",
-    difficulty: "Intermediate",
-    duration: "40 min",
-  },
-  {
-    id: 5,
-    title: "Software Engineering Best Practices",
-    description:
-      "Comprehensive quiz on SOLID principles, design patterns, and testing",
-    type: "Multi-PDF",
-    questions: 35,
-    participants: 89,
-    createdDate: "2024-01-11",
-    status: "active",
-    difficulty: "Advanced",
-    duration: "75 min",
-  },
-  {
-    id: 6,
-    title: "React Hooks and Context",
-    description: "Modern React development with hooks and state management",
-    type: "Page Range",
-    questions: 18,
-    participants: 24,
-    createdDate: "2024-01-10",
-    status: "active",
-    difficulty: "Intermediate",
-    duration: "35 min",
-  },
-];
+export function QuizList({ quizzes }: { quizzes: QuizType[] }) {
+  function formatDuration(start: string, end: string): string {
+    const duration =
+      (new Date(end).getTime() - new Date(start).getTime()) / 1000;
+    const hours = Math.floor(duration / 3600);
+    const minutes = Math.floor((duration % 3600) / 60);
+    const seconds = Math.floor(duration % 60);
+    return `${hours}h ${minutes}m ${seconds}s`;
+  }
 
-export function QuizList() {
   return (
     <Card className="border-0 shadow-md">
       <CardHeader>
@@ -121,29 +55,33 @@ export function QuizList() {
                   <div className="flex-1 space-y-2">
                     <div className="flex flex-col gap-2">
                       <h3 className="font-semibold text-gray-900 text-lg">
-                        {quiz.title}
+                        {quiz.name}
                       </h3>
                       <div className="flex items-center gap-2">
                         <Badge
                           variant={
-                            quiz.status === "active"
+                            quiz.processing_state === 1
                               ? "default"
-                              : quiz.status === "completed"
+                              : quiz.processing_state === 0
                               ? "secondary"
                               : "outline"
                           }
                           className={
-                            quiz.status === "active"
+                            quiz.processing_state === 1
                               ? "bg-green-100 text-green-700"
-                              : quiz.status === "completed"
+                              : quiz.processing_state === 0
                               ? "bg-blue-100 text-blue-700"
                               : "bg-gray-100 text-gray-700"
                           }
                         >
-                          {quiz.status}
+                          {quiz.processing_state === 1
+                            ? "Active"
+                            : quiz.processing_state === 0
+                            ? "Processing"
+                            : "Draft"}
                         </Badge>
                         <Badge variant="outline" className="text-xs">
-                          {quiz.type}
+                          {quiz.quiz_type}
                         </Badge>
                       </div>
                     </div>
@@ -155,23 +93,25 @@ export function QuizList() {
                   <div className="flex items-center gap-2">
                     <FileQuestion className="h-4 w-4 text-gray-400" />
                     <span className="text-gray-600">
-                      {quiz.questions} questions
+                      {quiz.questions_count} questions
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
                     <Users className="h-4 w-4 text-gray-400" />
                     <span className="text-gray-600">
-                      {quiz.participants} participants
+                      {quiz.participants_count} participants
                     </span>
                   </div>
                   <div className="text-gray-500">
-                    <span className="font-medium">{quiz.difficulty}</span> •{" "}
-                    {quiz.duration}
+                    <span className="font-medium">
+                      {quiz.quiz_difficulty.toUpperCase()}
+                    </span>{" "}
+                    • {formatDuration(quiz.start_time, quiz.end_time)}
                   </div>
                 </div>
 
                 <div className="text-xs text-gray-500">
-                  Created {quiz.createdDate}
+                  Created {formatDateTime(quiz.created_at)}
                 </div>
               </div>
 

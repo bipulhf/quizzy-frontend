@@ -111,13 +111,6 @@ export function PDFList({ uploads }: { uploads: UploadType[] }) {
 
                 {/* Right Actions */}
                 <div className="flex items-center gap-2">
-                  {upload.processing_state === 1 && (
-                    <Button size="sm" variant={"outline"}>
-                      <FileQuestion className="h-4 w-4 mr-2" />
-                      Create Quiz
-                    </Button>
-                  )}
-
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild className="">
                       <Button variant="ghost" size="sm">

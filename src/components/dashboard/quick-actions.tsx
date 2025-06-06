@@ -18,7 +18,7 @@ const actions = [
     description: "Generate new quiz",
     icon: FileQuestion,
     color: "bg-green-500 hover:bg-green-600",
-    href: "/dashboard/quizzes/create",
+    href: "/dashboard/quizzes?create=true",
   },
   {
     title: "Chat with PDFs",
