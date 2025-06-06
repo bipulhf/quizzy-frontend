@@ -47,9 +47,6 @@ export function UploadPdfModal({
     Record<string, { displayName: string }>
   >({});
   const [isUploading, setIsUploading] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState<Record<string, number>>(
-    {}
-  );
   const [uploadErrors, setUploadErrors] = useState<Record<string, string>>({});
   const [uploadSuccess, setUploadSuccess] = useState<string[]>([]);
 
@@ -74,7 +71,6 @@ export function UploadPdfModal({
 
       setFiles([]);
       setFileDetails({});
-      setUploadProgress({});
       setUploadErrors({});
       setUploadSuccess([]);
 
@@ -87,9 +83,6 @@ export function UploadPdfModal({
     onUploadError: (error) => {
       setIsUploading(false);
       toast.error(error.message);
-    },
-    onUploadProgress: (progress) => {
-      setUploadProgress((prev) => ({ ...prev, progress }));
     },
   });
 
@@ -121,10 +114,6 @@ export function UploadPdfModal({
     const newFileDetails = { ...fileDetails };
     delete newFileDetails[fileName];
     setFileDetails(newFileDetails);
-
-    const newUploadProgress = { ...uploadProgress };
-    delete newUploadProgress[fileName];
-    setUploadProgress(newUploadProgress);
 
     const newUploadErrors = { ...uploadErrors };
     delete newUploadErrors[fileName];
@@ -168,7 +157,6 @@ export function UploadPdfModal({
     if (!isUploading) {
       setFiles([]);
       setFileDetails({});
-      setUploadProgress({});
       setUploadErrors({});
       setUploadSuccess([]);
       onClose();
@@ -275,17 +263,8 @@ export function UploadPdfModal({
                   {/* Upload Status */}
                   {isUploading && (
                     <div className="space-y-2">
-                      <div className="w-full bg-gray-200 rounded-full h-2">
-                        <div
-                          className="bg-blue-600 h-2 rounded-full transition-all duration-300"
-                          style={{
-                            width: `${uploadProgress[file.name] || 0}%`,
-                          }}
-                        ></div>
-                      </div>
                       <div className="flex justify-between text-xs text-gray-500">
                         <span>Uploading...</span>
-                        <span>{uploadProgress[file.name] || 0}%</span>
                       </div>
                     </div>
                   )}

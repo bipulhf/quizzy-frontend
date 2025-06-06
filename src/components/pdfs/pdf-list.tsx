@@ -18,51 +18,13 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { UploadType } from "@/lib/types";
-
-// const pdfs = [
-//   {
-//     id: 1,
-//     name: "Machine Learning Fundamentals.pdf",
-//     uploadDate: "2024-01-15",
-//     pages: 67,
-//     quizzes: 5,
-//     status: "processed",
-//   },
-//   {
-//     id: 2,
-//     name: "Data Structures and Algorithms.pdf",
-//     uploadDate: "2024-01-14",
-//     pages: 89,
-//     quizzes: 7,
-//     status: "processed",
-//   },
-//   {
-//     id: 3,
-//     name: "Web Development Complete Guide.pdf",
-//     uploadDate: "2024-01-13",
-//     pages: 45,
-//     quizzes: 3,
-//     status: "processing",
-//   },
-//   {
-//     id: 4,
-//     name: "Database Design Principles.pdf",
-//     uploadDate: "2024-01-12",
-//     pages: 34,
-//     quizzes: 2,
-//     status: "processed",
-//   },
-//   {
-//     id: 5,
-//     name: "Software Engineering Best Practices.pdf",
-//     uploadDate: "2024-01-11",
-//     pages: 123,
-//     quizzes: 9,
-//     status: "processed",
-//   },
-// ];
+import { deleteUploadAction } from "@/action/uploads.action";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 export function PDFList({ uploads }: { uploads: UploadType[] }) {
+  const router = useRouter();
+
   return (
     <Card className="border-0 shadow-md">
       <CardHeader>
@@ -131,13 +93,13 @@ export function PDFList({ uploads }: { uploads: UploadType[] }) {
                     <div className="flex items-center gap-2">
                       <FileText className="h-4 w-4 text-gray-400" />
                       <span className="text-gray-600">
-                        {upload.pages} pages
+                        {upload.pages || 0} pages
                       </span>
                     </div>
                     <div className="flex items-center gap-2">
                       <FileQuestion className="h-4 w-4 text-gray-400" />
                       <span className="text-gray-600">
-                        {upload.pages} quizzes
+                        {upload.pages || 0} quizzes
                       </span>
                     </div>
                   </div>
@@ -177,7 +139,17 @@ export function PDFList({ uploads }: { uploads: UploadType[] }) {
                         Download
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
-                      <DropdownMenuItem className="text-red-600">
+                      <DropdownMenuItem
+                        className="text-red-600"
+                        onClick={async () => {
+                          toast.promise(deleteUploadAction({ id: upload.id }), {
+                            loading: "Deleting PDF...",
+                            success: "PDF deleted successfully",
+                            error: "Failed to delete PDF",
+                          });
+                          router.refresh();
+                        }}
+                      >
                         <Trash2 className="h-4 w-4 mr-2" />
                         Delete
                       </DropdownMenuItem>

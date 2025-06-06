@@ -78,3 +78,38 @@ export const uploadPdfAction = async ({
     };
   }
 };
+
+export const deleteUploadAction = async ({ id }: { id: number }) => {
+  try {
+    const cookieStore = await cookies();
+    const response = await fetch(`${API_URL}/uploads/${id}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${cookieStore.get("token")?.value}`,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to delete upload");
+    }
+
+    const data = await response.json();
+
+    return {
+      success: true,
+      data,
+    };
+  } catch (e) {
+    if (e instanceof Error) {
+      return {
+        success: false,
+        error: e.message,
+      };
+    }
+    return {
+      success: false,
+      error: "An unknown error occurred",
+    };
+  }
+};
