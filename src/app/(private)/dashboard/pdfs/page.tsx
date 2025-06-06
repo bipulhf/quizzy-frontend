@@ -1,8 +1,21 @@
 import { PDFsHeader } from "@/components/pdfs/pdfs-header";
 import { PDFFilters } from "@/components/pdfs/pdf-filters";
 import { PDFList } from "@/components/pdfs/pdf-list";
+import { listUploadsAction } from "@/action/uploads.action";
 
-export default function PDFsPage() {
+export default async function PDFsPage() {
+  const uploads = await listUploadsAction();
+
+  if (!uploads.success) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50/30">
+        <div className="container mx-auto p-4 md:p-6 lg:p-8 space-y-6">
+          <p className="text-red-500">{uploads.error}</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50/30">
       <div className="container mx-auto p-4 md:p-6 lg:p-8 space-y-6">
@@ -13,7 +26,7 @@ export default function PDFsPage() {
         <PDFFilters />
 
         {/* PDF List */}
-        <PDFList />
+        <PDFList uploads={uploads.data} />
       </div>
     </div>
   );

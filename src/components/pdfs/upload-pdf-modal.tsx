@@ -1,7 +1,5 @@
 "use client";
 
-import type React from "react";
-
 import { useState } from "react";
 import {
   Dialog,
@@ -73,9 +71,6 @@ export function UploadPdfModal({
 
       setIsUploading(false);
       setUploadSuccess(res.map((f) => f.name));
-      toast.success(
-        `Successfully uploaded ${res.length} file${res.length > 1 ? "s" : ""}.`
-      );
 
       setFiles([]);
       setFileDetails({});

@@ -90,7 +90,7 @@ export default function SignInPage() {
 
       if (response.success) {
         toast.success("Sign in successful");
-        router.push("/");
+        router.push("/dashboard");
       } else {
         toast.error(response.error);
       }

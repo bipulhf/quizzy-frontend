@@ -5,6 +5,8 @@ import { FileText, Upload } from "lucide-react";
 import { UploadPdfModal } from "./upload-pdf-modal";
 import { useState } from "react";
 import { useSearchParams } from "next/navigation";
+import { uploadPdfAction } from "@/action/uploads.action";
+import { toast } from "sonner";
 
 export function PDFsHeader() {
   const searchParams = useSearchParams();
@@ -13,15 +15,17 @@ export function PDFsHeader() {
     searchParams.get("modal") === "true"
   );
 
-  const handleUploadSuccess = (files: any[]) => {
-    console.log("Uploaded files:", files);
-    // Here you would typically update your state or trigger a refetch
-    // of the PDFs list to show the newly uploaded files
-
-    // Close the modal after a short delay to show success state
-    setTimeout(() => {
+  const handleUploadSuccess = (files: { name: string; url: string }[]) => {
+    (async () => {
+      for (const file of files) {
+        await uploadPdfAction({
+          url: file.url,
+          pdf_name: file.name,
+        });
+      }
       setIsUploadModalOpen(false);
-    }, 1000);
+      toast.success("PDFs uploaded successfully");
+    })();
   };
   return (
     <>
