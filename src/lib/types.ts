@@ -9,3 +9,11 @@ export type UploadType = {
   created_at: string;
   deleted_at: string;
 };
+
+export type DashboardInfoType = {
+  total_pdf: number;
+  total_quiz: number;
+  total_exam_participated: number;
+  recent_pdfs: UploadType[];
+  recent_quizzes: any[];
+};

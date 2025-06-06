@@ -42,7 +42,7 @@ export function QuickActions() {
       <CardHeader>
         <CardTitle className="text-lg font-semibold">Quick Actions</CardTitle>
       </CardHeader>
-      <CardContent className="grid grid-cols-2 gap-3">
+      <CardContent className="grid max-md:grid-cols-2 grid-cols-4 gap-3">
         {actions.map((action, index) => (
           <Button
             key={index}

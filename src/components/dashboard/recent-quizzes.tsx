@@ -70,7 +70,7 @@ const recentQuizzes = [
   },
 ];
 
-export function RecentQuizzes() {
+export function RecentQuizzes({ quizzes }: { quizzes: any[] }) {
   return (
     <Card className="border-0 shadow-md">
       <CardHeader className="flex flex-row items-center justify-between">
@@ -82,81 +82,87 @@ export function RecentQuizzes() {
         </Link>
       </CardHeader>
       <CardContent className="space-y-4">
-        {recentQuizzes.map((quiz) => (
-          <div
-            key={quiz.id}
-            className="flex items-center justify-between p-3 rounded-lg border bg-gray-50/50 hover:bg-gray-100/50 transition-colors"
-          >
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-green-100 rounded-lg">
-                <FileQuestion className="h-5 w-5 text-green-600" />
-              </div>
-              <div className="space-y-1">
-                <h4 className="font-medium text-gray-900 truncate max-w-[200px] sm:max-w-[300px]">
-                  {quiz.title}
-                </h4>
-                <div className="flex items-center gap-4 text-xs text-gray-500">
-                  <span>{quiz.questions} questions</span>
-                  <span className="flex items-center gap-1">
-                    <Users className="h-3 w-3" />
-                    {quiz.participants}
-                  </span>
-                  {quiz.avgScore && (
-                    <span className="text-green-600 font-medium">
-                      {quiz.avgScore}% avg
-                    </span>
-                  )}
+        {quizzes.length === 0 ? (
+          <p className="text-center text-gray-500">
+            No Quizzes found. Create a quiz to get started.
+          </p>
+        ) : (
+          quizzes.map((quiz) => (
+            <div
+              key={quiz.id}
+              className="flex items-center justify-between p-3 rounded-lg border bg-gray-50/50 hover:bg-gray-100/50 transition-colors"
+            >
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-green-100 rounded-lg">
+                  <FileQuestion className="h-5 w-5 text-green-600" />
                 </div>
-                <Badge variant="outline" className="text-xs">
-                  {quiz.type}
+                <div className="space-y-1">
+                  <h4 className="font-medium text-gray-900 truncate max-w-[200px] sm:max-w-[300px]">
+                    {quiz.title}
+                  </h4>
+                  <div className="flex items-center gap-4 text-xs text-gray-500">
+                    <span>{quiz.questions} questions</span>
+                    <span className="flex items-center gap-1">
+                      <Users className="h-3 w-3" />
+                      {quiz.participants}
+                    </span>
+                    {quiz.avgScore && (
+                      <span className="text-green-600 font-medium">
+                        {quiz.avgScore}% avg
+                      </span>
+                    )}
+                  </div>
+                  <Badge variant="outline" className="text-xs">
+                    {quiz.type}
+                  </Badge>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <Badge
+                  variant={
+                    quiz.status === "active"
+                      ? "default"
+                      : quiz.status === "completed"
+                      ? "secondary"
+                      : "outline"
+                  }
+                  className={
+                    quiz.status === "active"
+                      ? "bg-green-100 text-green-700"
+                      : quiz.status === "completed"
+                      ? "bg-blue-100 text-blue-700"
+                      : "bg-gray-100 text-gray-700"
+                  }
+                >
+                  {quiz.status}
                 </Badge>
+
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="sm">
+                      <MoreHorizontal className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem>
+                      <Play className="h-4 w-4 mr-2" />
+                      Start Quiz
+                    </DropdownMenuItem>
+                    <DropdownMenuItem>
+                      <Edit className="h-4 w-4 mr-2" />
+                      Edit
+                    </DropdownMenuItem>
+                    <DropdownMenuItem>
+                      <Share2 className="h-4 w-4 mr-2" />
+                      Share
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
             </div>
-
-            <div className="flex items-center gap-2">
-              <Badge
-                variant={
-                  quiz.status === "active"
-                    ? "default"
-                    : quiz.status === "completed"
-                    ? "secondary"
-                    : "outline"
-                }
-                className={
-                  quiz.status === "active"
-                    ? "bg-green-100 text-green-700"
-                    : quiz.status === "completed"
-                    ? "bg-blue-100 text-blue-700"
-                    : "bg-gray-100 text-gray-700"
-                }
-              >
-                {quiz.status}
-              </Badge>
-
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="sm">
-                    <MoreHorizontal className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem>
-                    <Play className="h-4 w-4 mr-2" />
-                    Start Quiz
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <Edit className="h-4 w-4 mr-2" />
-                    Edit
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <Share2 className="h-4 w-4 mr-2" />
-                    Share
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-          </div>
-        ))}
+          ))
+        )}
       </CardContent>
     </Card>
   );

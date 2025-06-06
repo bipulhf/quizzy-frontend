@@ -67,7 +67,8 @@ export const loginAction = async ({
     });
 
     if (!response.ok) {
-      throw new Error("Failed to login");
+      const error = await response.json();
+      throw new Error(error.detail);
     }
 
     const data = await response.json();

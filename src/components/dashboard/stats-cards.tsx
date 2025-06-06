@@ -1,46 +1,48 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { FileText, FileQuestion, Trophy, Coins } from "lucide-react";
 
-const stats = [
-  {
-    title: "Total PDFs",
-    value: "24",
-    change: "+3 this week",
-    trend: "up",
-    icon: FileText,
-    color: "text-blue-600",
-    bgColor: "bg-blue-100",
-  },
-  {
-    title: "Quizzes Created",
-    value: "18",
-    change: "+5 this week",
-    trend: "up",
-    icon: FileQuestion,
-    color: "text-green-600",
-    bgColor: "bg-green-100",
-  },
-  {
-    title: "Quizzes Participated",
-    value: "42",
-    change: "+12 this week",
-    trend: "up",
-    icon: Trophy,
-    color: "text-purple-600",
-    bgColor: "bg-purple-100",
-  },
-  {
-    title: "Remaining Credits",
-    value: "156",
-    change: "-8 this week",
-    trend: "down",
-    icon: Coins,
-    color: "text-orange-600",
-    bgColor: "bg-orange-100",
-  },
-];
+export function StatsCards({
+  total_pdfs,
+  total_quizzes,
+  total_exam_paticipated,
+  total_credits,
+}: {
+  total_pdfs: number;
+  total_quizzes: number;
+  total_exam_paticipated: number;
+  total_credits: number;
+}) {
+  const stats = [
+    {
+      title: "Total PDFs",
+      value: total_pdfs,
+      icon: FileText,
+      color: "text-blue-600",
+      bgColor: "bg-blue-100",
+    },
+    {
+      title: "Quizzes Created",
+      value: total_quizzes,
+      icon: FileQuestion,
+      color: "text-green-600",
+      bgColor: "bg-green-100",
+    },
+    {
+      title: "Quizzes Participated",
+      value: total_exam_paticipated,
+      icon: Trophy,
+      color: "text-purple-600",
+      bgColor: "bg-purple-100",
+    },
+    {
+      title: "Remaining Credits",
+      value: total_credits,
+      icon: Coins,
+      color: "text-orange-600",
+      bgColor: "bg-orange-100",
+    },
+  ];
 
-export function StatsCards() {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
       {stats.map((stat, index) => (
