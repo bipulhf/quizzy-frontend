@@ -14,6 +14,7 @@ export async function createQuizAction({
   end_page,
   upload_ids,
   quiz_difficulty,
+  questions_count,
 }: {
   name: string;
   retake: boolean;
@@ -25,6 +26,7 @@ export async function createQuizAction({
   end_page: number | null;
   upload_ids: number[];
   quiz_difficulty: string;
+  questions_count: number;
 }) {
   try {
     const cookieStore = await cookies();
@@ -46,6 +48,7 @@ export async function createQuizAction({
         end_page: end_page ? Number(end_page) : null,
         upload_ids,
         quiz_difficulty,
+        questions_count,
       }),
     });
 

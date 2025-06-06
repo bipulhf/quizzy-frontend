@@ -64,6 +64,7 @@ export function CreateQuizModal({
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [retake, setRetake] = useState(false);
   const [difficulty, setDifficulty] = useState("easy");
+  const [questions_count, setQuestionsCount] = useState(10);
   const router = useRouter();
 
   // Search and filter states
@@ -164,6 +165,10 @@ export function CreateQuizModal({
       }
     }
 
+    if (questions_count < 0) {
+      newErrors.questions_count = "Questions count must be at least 1";
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -185,6 +190,7 @@ export function CreateQuizModal({
         end_page: Number(endPage),
         upload_ids: selectedPDFs,
         quiz_difficulty: difficulty,
+        questions_count,
       });
 
       if (!quizData.success) {
@@ -201,7 +207,7 @@ export function CreateQuizModal({
       }
 
       handleClose();
-      router.push("/quizzes");
+      router.push("/dashboard/quizzes");
     } catch (error) {
       toast("Failed to Create Quiz");
     } finally {
@@ -221,6 +227,9 @@ export function CreateQuizModal({
       setStartDateTime("");
       setEndDateTime("");
       setSearchQuery("");
+      setQuestionsCount(10);
+      setRetake(false);
+      setDifficulty("easy");
       setErrors({});
       onClose();
     }
@@ -563,6 +572,29 @@ export function CreateQuizModal({
                   </p>
                 )}
               </div>
+            )}
+          </div>
+
+          {/* No of Question */}
+          <div className="space-y-2">
+            <Label htmlFor="no-of-questions" className="text-sm font-medium">
+              No of Questions *
+            </Label>
+            <Input
+              id="no-of-questions"
+              type="number"
+              value={questions_count}
+              onChange={(e) => setQuestionsCount(Number(e.target.value))}
+              placeholder="10"
+              min="1"
+              disabled={isCreating}
+              className={errors.questions_count ? "border-red-500" : ""}
+            />
+            {errors.questions_count && (
+              <p className="text-sm text-red-600 flex items-center gap-1">
+                <AlertCircle className="h-3 w-3" />
+                {errors.questions_count}
+              </p>
             )}
           </div>
 

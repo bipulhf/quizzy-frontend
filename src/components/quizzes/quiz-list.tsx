@@ -166,6 +166,7 @@ export function QuizList({ quizzes }: { quizzes: QuizType[] }) {
                                 (upload) => upload.id
                               ),
                               quiz_difficulty: quiz.quiz_difficulty,
+                              questions_count: quiz.questions_count,
                             }),
                             {
                               loading: "Creating Quiz...",
