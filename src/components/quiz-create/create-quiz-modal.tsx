@@ -37,21 +37,13 @@ import { Separator } from "../ui/separator";
 import { UploadType } from "@/lib/types";
 import { createQuizAction } from "@/action/quiz.action";
 import { formatDateTime } from "@/utils/date";
+import { useRouter } from "next/navigation";
 
 interface CreateQuizModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess?: (quiz: any) => void;
   pdfs: UploadType[];
-}
-
-interface PDF {
-  id: string;
-  name: string;
-  pages: number;
-  category: string;
-  uploadDate: string;
-  size: string;
 }
 
 export function CreateQuizModal({
@@ -72,6 +64,7 @@ export function CreateQuizModal({
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [retake, setRetake] = useState(false);
   const [difficulty, setDifficulty] = useState("easy");
+  const router = useRouter();
 
   // Search and filter states
   const [searchQuery, setSearchQuery] = useState("");
@@ -188,8 +181,8 @@ export function CreateQuizModal({
         end_time: endDateTime,
         quiz_type: quizType,
         topic,
-        start_page: startPage,
-        end_page: endPage,
+        start_page: Number(startPage),
+        end_page: Number(endPage),
         upload_ids: selectedPDFs,
         quiz_difficulty: difficulty,
       });
@@ -208,6 +201,7 @@ export function CreateQuizModal({
       }
 
       handleClose();
+      router.push("/quizzes");
     } catch (error) {
       toast("Failed to Create Quiz");
     } finally {

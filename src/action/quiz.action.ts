@@ -21,8 +21,8 @@ export async function createQuizAction({
   end_time: string;
   quiz_type: string;
   topic: string;
-  start_page: string;
-  end_page: string;
+  start_page: number | null;
+  end_page: number | null;
   upload_ids: number[];
   quiz_difficulty: string;
 }) {
@@ -90,6 +90,41 @@ export async function getQuizzesAction() {
 
     if (!response.ok) {
       throw new Error("Failed to fetch quizzes");
+    }
+
+    const data = await response.json();
+
+    return {
+      success: true,
+      data,
+    };
+  } catch (e) {
+    if (e instanceof Error) {
+      return {
+        success: false,
+        error: e.message,
+      };
+    }
+    return {
+      success: false,
+      error: "An unknown error occurred",
+    };
+  }
+}
+
+export async function deleteQuizAction({ id }: { id: number }) {
+  try {
+    const cookieStore = await cookies();
+    const response = await fetch(`${API_URL}/exams/${id}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${cookieStore.get("token")?.value}`,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to delete quiz");
     }
 
     const data = await response.json();

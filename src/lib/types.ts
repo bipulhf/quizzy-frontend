@@ -33,4 +33,5 @@ export type QuizType = {
   processing_state: number;
   created_at: string;
   quiz_difficulty: string;
+  uploads: UploadType[];
 };
