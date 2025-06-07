@@ -2,6 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { FileQuestion, Clock, Trophy, Eye, BarChart3 } from "lucide-react";
+import { DashboardTakeType } from "@/lib/types";
 
 const recentExams = [
   {
@@ -58,7 +59,7 @@ const recentExams = [
   },
 ];
 
-export function RecentExams() {
+export function RecentExams({ exams }: { exams: DashboardTakeType["takes"] }) {
   const getScoreBadgeColor = (score: number) => {
     if (score >= 90) return "bg-green-100 text-green-700";
     if (score >= 75) return "bg-blue-100 text-blue-700";
@@ -81,76 +82,70 @@ export function RecentExams() {
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        {recentExams.map((exam) => (
-          <div
-            key={exam.id}
-            className="flex items-center justify-between p-4 rounded-lg border bg-white hover:shadow-md transition-all duration-200"
-          >
-            <div className="flex items-center gap-4 flex-1">
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <FileQuestion className="h-5 w-5 text-blue-600" />
-              </div>
+        {exams.length === 0 ? (
+          <p className="text-center text-gray-500">
+            No Quizzes found. Create a quiz to get started.
+          </p>
+        ) : (
+          exams.map((exam) => (
+            <div
+              key={exam.id}
+              className="flex items-center justify-between p-4 rounded-lg border bg-white hover:shadow-md transition-all duration-200"
+            >
+              <div className="flex items-center gap-4 flex-1">
+                <div className="p-2 bg-blue-100 rounded-lg">
+                  <FileQuestion className="h-5 w-5 text-blue-600" />
+                </div>
 
-              <div className="flex-1 space-y-1">
-                <div className="flex items-center gap-2">
-                  <h3 className="font-medium text-gray-900">{exam.title}</h3>
-                  <Badge variant="outline" className="text-xs">
-                    {exam.difficulty}
-                  </Badge>
-                  {exam.status === "missed" && (
-                    <Badge variant="destructive" className="text-xs">
-                      Missed
+                <div className="flex-1 space-y-1">
+                  <div className="flex items-center gap-2">
+                    <h3 className="font-medium text-gray-900">
+                      {exam.quiz_name}
+                    </h3>
+                    <Badge variant="outline" className="text-xs">
+                      {exam.quiz_difficulty}
                     </Badge>
-                  )}
-                </div>
+                  </div>
 
-                <div className="flex items-center gap-4 text-sm text-gray-600">
-                  <span>{exam.date}</span>
-                  {exam.status === "completed" && (
-                    <>
-                      <span>•</span>
-                      <span>
-                        {exam.correctAnswers}/{exam.totalQuestions} correct
-                      </span>
-                      <span>•</span>
-                      <div className="flex items-center gap-1">
-                        <Clock className="h-3 w-3" />
-                        <span>{exam.timeSpent}</span>
-                      </div>
-                      {exam.rank && (
-                        <>
-                          <span>•</span>
-                          <div className="flex items-center gap-1">
-                            {getRankIcon(exam.rank)}
-                            <span>
-                              Rank #{exam.rank}/{exam.totalParticipants}
-                            </span>
-                          </div>
-                        </>
-                      )}
-                    </>
-                  )}
+                  <div className="flex items-center gap-4 text-sm text-gray-600">
+                    <span>{exam.quiz_created_at}</span>
+                    {exam.correct_answers && (
+                      <>
+                        <span>•</span>
+                        <span>
+                          {exam.correct_answers}/{exam.total_questions} correct
+                        </span>
+                        <span>•</span>
+                        <div className="flex items-center gap-1">
+                          {getRankIcon(exam.ranking)}
+                          <span>
+                            Rank #{exam.ranking}/{exam.total_participants}
+                          </span>
+                        </div>
+                      </>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
 
-            <div className="flex items-center gap-3">
-              {exam.status === "completed" && (
-                <Badge className={getScoreBadgeColor(exam.score)}>
-                  {exam.score}%
-                </Badge>
-              )}
-
-              <Button variant="ghost" size="sm">
-                {exam.status === "completed" ? (
-                  <Eye className="h-4 w-4" />
-                ) : (
-                  <BarChart3 className="h-4 w-4" />
+              <div className="flex items-center gap-3">
+                {exam.correct_answers && (
+                  <Badge
+                    className={getScoreBadgeColor(
+                      (exam.correct_answers / exam.total_questions) * 100
+                    )}
+                  >
+                    {(
+                      (exam.correct_answers / exam.total_questions) *
+                      100
+                    ).toFixed(2)}
+                    %
+                  </Badge>
                 )}
-              </Button>
+              </div>
             </div>
-          </div>
-        ))}
+          ))
+        )}
       </CardContent>
     </Card>
   );

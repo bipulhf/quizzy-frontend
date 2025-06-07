@@ -57,3 +57,20 @@ export type TakeExamType = {
   exam: Omit<QuizType, "questions" | "uploads">;
   questions: Omit<QuestionType, "correct_answer" | "explanation">[];
 };
+
+export type DashboardTakeType = {
+  total_exams: number;
+  avg_score: number;
+  best_score: number;
+  takes: {
+    id: number;
+    quiz_name: string;
+    quiz_difficulty: string;
+    quiz_type: string;
+    correct_answers: number;
+    quiz_created_at: string;
+    ranking: number;
+    total_participants: number;
+    total_questions: number;
+  }[];
+};

@@ -3,6 +3,40 @@
 import { API_URL } from "@/lib/data";
 import { cookies } from "next/headers";
 
+export async function getMyExamsAction() {
+  try {
+    const cookieStore = await cookies();
+    const response = await fetch(`${API_URL}/dashboard/takes`, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${cookieStore.get("token")?.value}`,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch exams");
+    }
+
+    const data = await response.json();
+
+    return {
+      success: true,
+      data,
+    };
+  } catch (e) {
+    if (e instanceof Error) {
+      return {
+        success: false,
+        error: e.message,
+      };
+    }
+    return {
+      success: false,
+      error: "An unknown error occurred",
+    };
+  }
+}
+
 export async function getExamInfoAction(id: string) {
   try {
     const cookieStore = await cookies();
