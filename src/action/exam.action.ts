@@ -174,7 +174,12 @@ export async function getExamAnswersAction(takes_id: number) {
     });
 
     if (!response.ok) {
-      throw new Error("Failed to fetch exam answers");
+      const error = await response.json();
+      throw new Error(
+        typeof error.detail === "string"
+          ? error.detail
+          : "Failed to fetch exam answers"
+      );
     }
 
     const data = await response.json();

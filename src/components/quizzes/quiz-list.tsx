@@ -195,7 +195,13 @@ export function QuizList({ quizzes }: { quizzes: QuizType[] }) {
                         <Share2 className="h-4 w-4 mr-2" />
                         Copy Link
                       </DropdownMenuItem>
-                      <DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => {
+                          router.push(
+                            `/dashboard/quizzes/${quiz.id}/analytics`
+                          );
+                        }}
+                      >
                         <BarChart3 className="h-4 w-4 mr-2" />
                         Analytics
                       </DropdownMenuItem>

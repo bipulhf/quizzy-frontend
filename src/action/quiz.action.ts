@@ -151,6 +151,40 @@ export async function deleteQuizAction({ id }: { id: number }) {
   }
 }
 
+export async function getQuizAnalyticsAction(id: string) {
+  try {
+    const cookieStore = await cookies();
+    const response = await fetch(`${API_URL}/exams/${id}/analytics`, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${cookieStore.get("token")?.value}`,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch quiz analytics");
+    }
+
+    const data = await response.json();
+
+    return {
+      success: true,
+      data,
+    };
+  } catch (e) {
+    if (e instanceof Error) {
+      return {
+        success: false,
+        error: e.message,
+      };
+    }
+    return {
+      success: false,
+      error: "An unknown error occurred",
+    };
+  }
+}
+
 export async function getQuizAction(id: string) {
   try {
     const cookieStore = await cookies();

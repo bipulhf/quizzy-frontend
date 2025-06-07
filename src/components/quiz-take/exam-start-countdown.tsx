@@ -226,6 +226,7 @@ export function ExamStartCountdown({ exam }: { exam: ExamData }) {
 
     setIsLoading(true);
     const fingerprint = await getFingerprint();
+    console.log("fingerprint", fingerprint);
     const data = await takeExamAction({
       exam_id: exam.id,
       device_id: fingerprint,

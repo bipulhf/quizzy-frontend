@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { FileQuestion, Trophy } from "lucide-react";
 import { DashboardTakeType } from "@/lib/types";
 import { useRouter } from "next/navigation";
+import { formatDateTime } from "@/utils/date";
 
 const recentExams = [
   {
@@ -113,7 +114,7 @@ export function RecentExams({ exams }: { exams: DashboardTakeType["takes"] }) {
                   </div>
 
                   <div className="flex items-center gap-4 text-sm text-gray-600">
-                    <span>{exam.quiz_created_at}</span>
+                    <span>{formatDateTime(exam.quiz_created_at)}</span>
                     {exam.correct_answers && (
                       <>
                         <span>•</span>

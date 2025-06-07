@@ -108,3 +108,71 @@ export type ExamResultType = {
   }[];
   created_at: string;
 };
+
+export interface ParticipantSummary {
+  user_id: number;
+  username: string;
+  correct_answers: number;
+  total_questions: number;
+  score_percentage: number; // 0-100
+  ranking: number; // 1-based rank
+  time_taken: number | null; // seconds (or whatever unit you adopt)
+  completed_at: string; // ISO-8601 timestamp
+}
+
+export interface QuestionAnalytics {
+  question_id: number;
+  question_text: string;
+  total_attempts: number;
+  correct_attempts: number;
+  success_rate: number; // percentage, e.g. 33.33
+  option_1_count: number;
+  option_2_count: number;
+  option_3_count: number;
+  option_4_count: number;
+  correct_option: "1" | "2" | "3" | "4";
+}
+
+export interface ScoreDistributionBucket {
+  score_range: string; // e.g. "0-20"
+  count: number;
+  percentage: number; // 0-100
+}
+
+export interface DailyParticipantsCount {
+  date: string; // YYYY-MM-DD
+  count: number;
+}
+
+/* ─────────────────────────  Root Object  ─────────────────────── */
+
+export interface QuizAnalyticsType {
+  exam_id: number;
+  exam_name: string;
+  exam_creator: string;
+  quiz_type: "topic" | "page_range" | string;
+  quiz_difficulty: "easy" | "medium" | "hard";
+  topic: string | null;
+  start_page: number | null;
+  end_page: number | null;
+  questions_count: number;
+  created_at: string; // ISO-8601
+  start_time: string; // ISO-8601
+  end_time: string; // ISO-8601
+
+  /* Aggregate performance */
+  total_participants: number;
+  total_completed: number;
+  completion_rate: number; // percentage
+  average_score: number; // 0-100
+  median_score: number; // 0-100
+  highest_score: number; // 0-100
+  lowest_score: number; // 0-100
+  std_deviation: number;
+
+  /* Detailed lists */
+  participants: ParticipantSummary[];
+  question_analytics: QuestionAnalytics[];
+  score_distribution: ScoreDistributionBucket[];
+  daily_participants: DailyParticipantsCount[];
+}
