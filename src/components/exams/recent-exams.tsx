@@ -1,8 +1,10 @@
+"use client";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { FileQuestion, Clock, Trophy, Eye, BarChart3 } from "lucide-react";
+import { FileQuestion, Trophy } from "lucide-react";
 import { DashboardTakeType } from "@/lib/types";
+import { useRouter } from "next/navigation";
 
 const recentExams = [
   {
@@ -60,6 +62,8 @@ const recentExams = [
 ];
 
 export function RecentExams({ exams }: { exams: DashboardTakeType["takes"] }) {
+  const router = useRouter();
+
   const getScoreBadgeColor = (score: number) => {
     if (score >= 90) return "bg-green-100 text-green-700";
     if (score >= 75) return "bg-blue-100 text-blue-700";
@@ -90,7 +94,8 @@ export function RecentExams({ exams }: { exams: DashboardTakeType["takes"] }) {
           exams.map((exam) => (
             <div
               key={exam.id}
-              className="flex items-center justify-between p-4 rounded-lg border bg-white hover:shadow-md transition-all duration-200"
+              className="flex items-center justify-between p-4 rounded-lg border bg-white hover:shadow-md transition-all duration-200 cursor-pointer"
+              onClick={() => router.push(`/dashboard/exams/${exam.id}`)}
             >
               <div className="flex items-center gap-4 flex-1">
                 <div className="p-2 bg-blue-100 rounded-lg">
@@ -103,7 +108,7 @@ export function RecentExams({ exams }: { exams: DashboardTakeType["takes"] }) {
                       {exam.quiz_name}
                     </h3>
                     <Badge variant="outline" className="text-xs">
-                      {exam.quiz_difficulty}
+                      {exam.quiz_difficulty.toUpperCase()}
                     </Badge>
                   </div>
 

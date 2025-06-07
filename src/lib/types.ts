@@ -74,3 +74,37 @@ export type DashboardTakeType = {
     total_questions: number;
   }[];
 };
+
+export type ExamResultType = {
+  take_id: number;
+  exam: {
+    id: number;
+    name: string;
+    quiz_difficulty: "easy" | "medium" | "hard";
+    quiz_type: "topic" | "page_range" | string;
+    topic: string | null;
+    start_page: number | null;
+    end_page: number | null;
+    questions_count: number;
+    created_at: string;
+  };
+  user_id: number;
+  correct_answers: number;
+  total_questions: number;
+  score_percentage: number;
+  ranking: number;
+  total_participants: number;
+  questions: {
+    id: number;
+    text: string;
+    option_1: string;
+    option_2: string;
+    option_3: string;
+    option_4: string;
+    correct_answer: string;
+    explanation: string;
+    user_answer: string;
+    is_correct: boolean;
+  }[];
+  created_at: string;
+};
