@@ -81,3 +81,50 @@ export async function takeExamAction({
     };
   }
 }
+
+export async function submitExamAction({
+  takes_id,
+  answers,
+}: {
+  takes_id: number;
+  answers: { question_id: number; answer: string }[];
+}) {
+  try {
+    const cookieStore = await cookies();
+    const response = await fetch(`${API_URL}/answers/bulk`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${cookieStore.get("token")?.value}`,
+      },
+      body: JSON.stringify({ takes_id, answers }),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(
+        typeof error.detail === "string"
+          ? error.detail
+          : "Failed to submit exam"
+      );
+    }
+
+    const data = await response.json();
+
+    return {
+      success: true,
+      data,
+    };
+  } catch (e) {
+    if (e instanceof Error) {
+      return {
+        success: false,
+        error: e.message,
+      };
+    }
+    return {
+      success: false,
+      error: "An unknown error occurred",
+    };
+  }
+}

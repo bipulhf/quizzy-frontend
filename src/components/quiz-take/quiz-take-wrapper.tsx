@@ -1,24 +1,53 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { TakeExamHeader } from "@/components/quiz-take/take-exam-header";
 import { QuestionNavigation } from "@/components/quiz-take/question-navigation";
 import { QuestionsList as ExamQuestionsList } from "@/components/quiz-take/questions-list";
 import { ExamResults } from "@/components/quiz-take/exam-results";
 import { ExamRankings } from "@/components/quiz-take/exam-rankings";
 import { TakeExamType } from "@/lib/types";
+import { submitExamAction } from "@/action/exam.action";
+import { toast } from "sonner";
 
-export function QuizTakeWrapper({ examData }: { examData: TakeExamType }) {
+export function QuizTakeWrapper({
+  examData,
+  examStatus,
+}: {
+  examData: TakeExamType;
+  examStatus: "upcoming" | "active" | "ended";
+}) {
   const [currentView, setCurrentView] = useState<
     "exam" | "results" | "rankings"
   >("exam");
   const [isSubmitted, setIsSubmitted] = useState(false);
-  const [answers, setAnswers] = useState<Record<number, string>>({});
+  const [answers, setAnswers] = useState<
+    { question_id: number; answer: string }[]
+  >([]);
+  const [score, setScore] = useState<number>(0);
 
-  const handleSubmitExam = () => {
+  const handleSubmitExam = async () => {
     setIsSubmitted(true);
+    const response = await submitExamAction({
+      takes_id: examData.takes_id,
+      answers,
+    });
+    if (!response.success) {
+      toast.error(response.error);
+      return;
+    }
+    toast.success("Exam submitted successfully");
+    setScore(response.data.correct_answers);
+
+    window.scrollTo({ top: 0, behavior: "smooth" });
     setCurrentView("results");
   };
+
+  useEffect(() => {
+    if (examStatus === "ended") {
+      handleSubmitExam();
+    }
+  }, [examStatus]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50/30">
@@ -39,13 +68,15 @@ export function QuizTakeWrapper({ examData }: { examData: TakeExamType }) {
             {/* Question Navigation */}
             <QuestionNavigation
               answeredCount={
-                examData.questions.filter((question) => answers[question.id])
-                  .length
+                examData.questions.filter((question) =>
+                  answers.find((a) => a.question_id === question.id)
+                ).length
               }
               remainingCount={
                 examData.questions.length -
-                examData.questions.filter((question) => answers[question.id])
-                  .length
+                examData.questions.filter((question) =>
+                  answers.find((a) => a.question_id === question.id)
+                ).length
               }
             />
 
@@ -59,7 +90,13 @@ export function QuizTakeWrapper({ examData }: { examData: TakeExamType }) {
           </>
         )}
 
-        {currentView === "results" && isSubmitted && <ExamResults />}
+        {currentView === "results" && isSubmitted && (
+          <ExamResults
+            questions={examData.questions}
+            answers={answers}
+            score={score}
+          />
+        )}
 
         {currentView === "rankings" && isSubmitted && <ExamRankings />}
       </div>

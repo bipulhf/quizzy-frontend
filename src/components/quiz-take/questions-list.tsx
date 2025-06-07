@@ -9,8 +9,10 @@ import { QuestionType } from "@/lib/types";
 
 interface QuestionsListProps {
   onSubmit: () => void;
-  answers: Record<number, string>;
-  setAnswers: Dispatch<SetStateAction<Record<number, string>>>;
+  answers: { question_id: number; answer: string }[];
+  setAnswers: Dispatch<
+    SetStateAction<{ question_id: number; answer: string }[]>
+  >;
   questions: Omit<QuestionType, "correct_answer" | "explanation">[];
 }
 
@@ -21,11 +23,27 @@ export function QuestionsList({
   questions,
 }: QuestionsListProps) {
   const handleAnswerChange = (questionId: number, value: string) => {
-    setAnswers((prev) => ({ ...prev, [questionId]: value }));
+    setAnswers((prev) => {
+      const existingAnswerIndex = prev.findIndex(
+        (a) => a.question_id === questionId
+      );
+
+      if (existingAnswerIndex >= 0) {
+        // Update existing answer
+        return prev.map((a) =>
+          a.question_id === questionId ? { ...a, answer: value } : a
+        );
+      } else {
+        // Add new answer
+        return [...prev, { question_id: questionId, answer: value }];
+      }
+    });
   };
 
   const handleSubmit = () => {
-    const unanswered = questions.filter((q) => !answers[q.id]);
+    const unanswered = questions.filter(
+      (q) => !answers.find((a) => a.question_id === q.id)
+    );
     if (unanswered.length > 0) {
       const confirm = window.confirm(
         `You have ${unanswered.length} unanswered questions. Are you sure you want to submit?`
@@ -48,13 +66,16 @@ export function QuestionsList({
             <p className="text-gray-900 font-medium">{question.text}</p>
 
             <RadioGroup
-              value={answers[question.id] || ""}
+              value={
+                answers.find((a) => a.question_id === question.id)?.answer || ""
+              }
               onValueChange={(value) => handleAnswerChange(question.id, value)}
             >
               <div
                 onClick={() => handleAnswerChange(question.id, "1")}
                 className={`flex items-center space-x-3 p-3 rounded-lg border cursor-pointer ${
-                  answers[question.id] === "1"
+                  answers.find((a) => a.question_id === question.id)?.answer ===
+                  "1"
                     ? "bg-blue-100/50"
                     : "hover:bg-gray-50"
                 }`}
@@ -71,7 +92,8 @@ export function QuestionsList({
               <div
                 onClick={() => handleAnswerChange(question.id, "2")}
                 className={`flex items-center space-x-3 p-3 rounded-lg border cursor-pointer ${
-                  answers[question.id] === "2"
+                  answers.find((a) => a.question_id === question.id)?.answer ===
+                  "2"
                     ? "bg-blue-100/50"
                     : "hover:bg-gray-50"
                 }`}
@@ -88,7 +110,8 @@ export function QuestionsList({
               <div
                 onClick={() => handleAnswerChange(question.id, "3")}
                 className={`flex items-center space-x-3 p-3 rounded-lg border cursor-pointer ${
-                  answers[question.id] === "3"
+                  answers.find((a) => a.question_id === question.id)?.answer ===
+                  "3"
                     ? "bg-blue-100/50"
                     : "hover:bg-gray-50"
                 }`}
@@ -105,7 +128,8 @@ export function QuestionsList({
               <div
                 onClick={() => handleAnswerChange(question.id, "4")}
                 className={`flex items-center space-x-3 p-3 rounded-lg border cursor-pointer ${
-                  answers[question.id] === "4"
+                  answers.find((a) => a.question_id === question.id)?.answer ===
+                  "4"
                     ? "bg-blue-100/50"
                     : "hover:bg-gray-50"
                 }`}

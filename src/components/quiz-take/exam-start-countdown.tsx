@@ -129,7 +129,6 @@ export function ExamStartCountdown({ exam }: { exam: ExamData }) {
       toast.error(data.error);
       return;
     }
-    console.log(data);
     setExamData(data.data);
   };
 
@@ -163,7 +162,7 @@ export function ExamStartCountdown({ exam }: { exam: ExamData }) {
   const endDateTime = formatDateTime(exam.end_time);
 
   if (examData && examStatus === "active") {
-    return <QuizTakeWrapper examData={examData} />;
+    return <QuizTakeWrapper examData={examData} examStatus={examStatus} />;
   }
 
   return (
