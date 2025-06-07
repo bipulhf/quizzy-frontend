@@ -9,7 +9,6 @@ export default async function QuizzesPage() {
   const quizzesPromise = getQuizzesAction();
 
   const [pdfs, quizzes] = await Promise.all([pdfsPromise, quizzesPromise]);
-  console.log(quizzes);
 
   if (!pdfs.success || !quizzes.success) {
     return (

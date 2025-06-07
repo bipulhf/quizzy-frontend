@@ -18,6 +18,19 @@ export type DashboardInfoType = {
   recent_quizzes: QuizType[];
 };
 
+export type QuestionType = {
+  id: number;
+  exam_id: number;
+  text: string;
+  option_1: string;
+  option_2: string;
+  option_3: string;
+  option_4: string;
+  created_at?: string;
+  correct_answer: string;
+  explanation: string;
+};
+
 export type QuizType = {
   id: number;
   name: string;
@@ -34,4 +47,5 @@ export type QuizType = {
   created_at: string;
   quiz_difficulty: string;
   uploads: UploadType[];
+  questions: QuestionType[];
 };

@@ -146,7 +146,11 @@ export function QuizList({ quizzes }: { quizzes: QuizType[] }) {
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-48">
-                      <DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => {
+                          router.push(`/dashboard/quizzes/${quiz.id}/edit`);
+                        }}
+                      >
                         <Edit className="h-4 w-4 mr-2" />
                         Edit Quiz
                       </DropdownMenuItem>

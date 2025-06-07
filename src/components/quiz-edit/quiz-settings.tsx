@@ -14,11 +14,24 @@ import { Switch } from "@/components/ui/switch";
 import { AlertCircle, Calendar, Clock } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Badge } from "../ui/badge";
+import { QuizType } from "@/lib/types";
 
-export function QuizSettings() {
-  const [startTime, setStartTime] = useState("2024-01-20T09:00");
-  const [endTime, setEndTime] = useState("2024-01-20T10:30");
-  const [duration, setDuration] = useState(90);
+export function QuizSettings({
+  quizData,
+  onUpdate,
+}: {
+  quizData: QuizType;
+  onUpdate: (updates: Partial<QuizType>) => void;
+}) {
+  const [startTime, setStartTime] = useState(quizData.start_time);
+  const [endTime, setEndTime] = useState(quizData.end_time);
+  const [duration, setDuration] = useState(
+    Math.round(
+      (new Date(quizData.end_time).getTime() -
+        new Date(quizData.start_time).getTime()) /
+        (1000 * 60)
+    )
+  );
 
   // Calculate duration when start or end time changes
   useEffect(() => {
@@ -31,6 +44,11 @@ export function QuizSettings() {
       setDuration(diffInMinutes > 0 ? diffInMinutes : 0);
     }
   }, [startTime, endTime]);
+
+  // Update parent component when values change
+  useEffect(() => {
+    onUpdate({ start_time: startTime, end_time: endTime });
+  }, [startTime, endTime]); // Removed onUpdate from dependencies to avoid infinite loops
 
   const isValidTimeRange = () => {
     if (!startTime || !endTime) return true;
@@ -56,21 +74,29 @@ export function QuizSettings() {
         <CardTitle className="text-lg font-semibold">Quiz Settings</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="space-y-2">
+        <div className="flex items-center gap-2">
           <Label htmlFor="quiz-title">Quiz Title</Label>
-          <Input id="quiz-title" defaultValue="Machine Learning Fundamentals" />
+          <Input
+            id="quiz-title"
+            className="flex-1"
+            value={quizData.name}
+            onChange={(e) => onUpdate({ name: e.target.value })}
+          />
         </div>
 
-        <div className="space-y-2">
+        <div className="flex items-center gap-2">
           <Label>Difficulty</Label>
-          <Select defaultValue="intermediate">
-            <SelectTrigger>
+          <Select
+            value={quizData.quiz_difficulty}
+            onValueChange={(value) => onUpdate({ quiz_difficulty: value })}
+          >
+            <SelectTrigger className="flex-1">
               <SelectValue placeholder="Difficulty" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="beginner">Beginner</SelectItem>
-              <SelectItem value="intermediate">Intermediate</SelectItem>
-              <SelectItem value="advanced">Advanced</SelectItem>
+              <SelectItem value="easy">Easy</SelectItem>
+              <SelectItem value="medium">Medium</SelectItem>
+              <SelectItem value="hard">Hard</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -149,8 +175,22 @@ export function QuizSettings() {
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <Label htmlFor="allow-retake">Allow Retake</Label>
-            <Switch id="allow-retake" />
+            <Switch
+              id="allow-retake"
+              checked={quizData.retake}
+              onCheckedChange={(checked) => onUpdate({ retake: checked })}
+            />
           </div>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <Label htmlFor="questions-count">Quiz Type</Label>
+          <Badge variant="outline">{quizData.quiz_type.toUpperCase()}</Badge>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <Label htmlFor="questions-count">Number of Questions</Label>
+          <Badge variant="outline">{quizData.questions_count}</Badge>
         </div>
       </CardContent>
     </Card>
