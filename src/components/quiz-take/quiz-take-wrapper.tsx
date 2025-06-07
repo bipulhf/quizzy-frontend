@@ -6,12 +6,14 @@ import { QuestionNavigation } from "@/components/quiz-take/question-navigation";
 import { QuestionsList as ExamQuestionsList } from "@/components/quiz-take/questions-list";
 import { ExamResults } from "@/components/quiz-take/exam-results";
 import { ExamRankings } from "@/components/quiz-take/exam-rankings";
+import { TakeExamType } from "@/lib/types";
 
-export function QuizTakeWrapper({ quizId }: { quizId: string }) {
+export function QuizTakeWrapper({ examData }: { examData: TakeExamType }) {
   const [currentView, setCurrentView] = useState<
     "exam" | "results" | "rankings"
   >("exam");
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [answers, setAnswers] = useState<Record<number, string>>({});
 
   const handleSubmitExam = () => {
     setIsSubmitted(true);
@@ -23,7 +25,10 @@ export function QuizTakeWrapper({ quizId }: { quizId: string }) {
       <div className="container mx-auto p-4 md:p-6 lg:p-8 space-y-6">
         {/* Header */}
         <TakeExamHeader
-          quizId={quizId}
+          examName={examData.exam.name}
+          startTime={examData.exam.start_time}
+          endTime={examData.exam.end_time}
+          examQuestions={examData.questions.length}
           currentView={currentView}
           setCurrentView={setCurrentView}
           isSubmitted={isSubmitted}
@@ -32,10 +37,25 @@ export function QuizTakeWrapper({ quizId }: { quizId: string }) {
         {currentView === "exam" && !isSubmitted && (
           <>
             {/* Question Navigation */}
-            <QuestionNavigation />
+            <QuestionNavigation
+              answeredCount={
+                examData.questions.filter((question) => answers[question.id])
+                  .length
+              }
+              remainingCount={
+                examData.questions.length -
+                examData.questions.filter((question) => answers[question.id])
+                  .length
+              }
+            />
 
             {/* Questions List */}
-            <ExamQuestionsList onSubmit={handleSubmitExam} />
+            <ExamQuestionsList
+              questions={examData.questions}
+              answers={answers}
+              setAnswers={setAnswers}
+              onSubmit={handleSubmitExam}
+            />
           </>
         )}
 

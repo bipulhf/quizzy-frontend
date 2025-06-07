@@ -184,9 +184,16 @@ export function QuizList({ quizzes }: { quizzes: QuizType[] }) {
                         <Copy className="h-4 w-4 mr-2" />
                         Duplicate
                       </DropdownMenuItem>
-                      <DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => {
+                          navigator.clipboard.writeText(
+                            `http://${window.location.host}/dashboard/quizzes/${quiz.id}/take`
+                          );
+                          toast.success("Link copied to clipboard");
+                        }}
+                      >
                         <Share2 className="h-4 w-4 mr-2" />
-                        Share
+                        Copy Link
                       </DropdownMenuItem>
                       <DropdownMenuItem>
                         <BarChart3 className="h-4 w-4 mr-2" />

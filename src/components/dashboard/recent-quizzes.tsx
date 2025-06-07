@@ -1,3 +1,5 @@
+"use client";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -16,6 +18,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import Link from "next/link";
 import { QuizType } from "@/lib/types";
+import { toast } from "sonner";
 
 export function RecentQuizzes({ quizzes }: { quizzes: QuizType[] }) {
   return (
@@ -92,9 +95,16 @@ export function RecentQuizzes({ quizzes }: { quizzes: QuizType[] }) {
                       <Edit className="h-4 w-4 mr-2" />
                       Edit
                     </DropdownMenuItem>
-                    <DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => {
+                        navigator.clipboard.writeText(
+                          `http://${window.location.host}/dashboard/quizzes/${quiz.id}/take`
+                        );
+                        toast.success("Link copied to clipboard");
+                      }}
+                    >
                       <Share2 className="h-4 w-4 mr-2" />
-                      Share
+                      Copy Link
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>

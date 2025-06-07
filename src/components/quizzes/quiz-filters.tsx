@@ -22,18 +22,6 @@ export function QuizFilters() {
         <div className="flex flex-wrap gap-2">
           <Select>
             <SelectTrigger className="w-[140px] bg-white">
-              <SelectValue placeholder="Status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Status</SelectItem>
-              <SelectItem value="active">Active</SelectItem>
-              <SelectItem value="will-start">Will Start</SelectItem>
-              <SelectItem value="completed">Completed</SelectItem>
-            </SelectContent>
-          </Select>
-
-          <Select>
-            <SelectTrigger className="w-[140px] bg-white">
               <SelectValue placeholder="Type" />
             </SelectTrigger>
             <SelectContent>

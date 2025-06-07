@@ -49,3 +49,11 @@ export type QuizType = {
   uploads: UploadType[];
   questions: QuestionType[];
 };
+
+export type TakeExamType = {
+  message: "Exam started";
+  takes_id: number;
+  exam_id: number;
+  exam: Omit<QuizType, "questions" | "uploads">;
+  questions: Omit<QuestionType, "correct_answer" | "explanation">[];
+};
