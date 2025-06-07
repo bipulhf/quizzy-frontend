@@ -9,6 +9,7 @@ import { ExamRankings } from "@/components/quiz-take/exam-rankings";
 import { TakeExamType } from "@/lib/types";
 import { submitExamAction } from "@/action/exam.action";
 import { toast } from "sonner";
+import useTabActive from "@/hooks/useTabActive";
 
 export function QuizTakeWrapper({
   examData,
@@ -25,6 +26,7 @@ export function QuizTakeWrapper({
     { question_id: number; answer: string }[]
   >([]);
   const [score, setScore] = useState<number>(0);
+  const isTabActive = useTabActive();
 
   const handleSubmitExam = async () => {
     setIsSubmitted(true);
@@ -44,10 +46,10 @@ export function QuizTakeWrapper({
   };
 
   useEffect(() => {
-    if (examStatus === "ended") {
+    if (examStatus === "ended" || !isTabActive) {
       handleSubmitExam();
     }
-  }, [examStatus]);
+  }, [examStatus, isTabActive]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50/30">

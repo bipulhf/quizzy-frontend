@@ -11,6 +11,9 @@ import {
   RotateCcw,
   Play,
   Lock,
+  Camera,
+  Clipboard,
+  XCircle,
 } from "lucide-react";
 import { QuizTakeWrapper } from "./quiz-take-wrapper";
 import { getFingerprint } from "@thumbmarkjs/thumbmarkjs";
@@ -35,6 +38,11 @@ interface TimeRemaining {
   total: number;
 }
 
+interface PermissionStatus {
+  camera: boolean;
+  clipboard: boolean;
+}
+
 export function ExamStartCountdown({ exam }: { exam: ExamData }) {
   const [timeUntilStart, setTimeUntilStart] = useState<TimeRemaining | null>(
     null
@@ -45,6 +53,11 @@ export function ExamStartCountdown({ exam }: { exam: ExamData }) {
   );
   const [examData, setExamData] = useState<TakeExamType | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [permissions, setPermissions] = useState<PermissionStatus>({
+    camera: false,
+    clipboard: false,
+  });
+  const [isCheckingPermissions, setIsCheckingPermissions] = useState(false);
 
   const calculateTimeRemaining = useCallback(
     (targetTime: string): TimeRemaining => {
@@ -117,7 +130,100 @@ export function ExamStartCountdown({ exam }: { exam: ExamData }) {
     };
   };
 
+  const checkPermissions = useCallback(async () => {
+    const newPermissions: PermissionStatus = {
+      camera: false,
+      clipboard: false,
+    };
+
+    try {
+      // Check camera permission
+      const cameraPermission = await navigator.permissions.query({
+        name: "camera" as PermissionName,
+      });
+      newPermissions.camera = cameraPermission.state === "granted";
+
+      // Check clipboard permission (for clipboard-read)
+      const clipboardPermission = await navigator.permissions.query({
+        name: "clipboard-read" as PermissionName,
+      });
+      newPermissions.clipboard = clipboardPermission.state === "granted";
+    } catch (error) {
+      // Fallback: try to access the devices directly
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: true,
+        });
+        newPermissions.camera = true;
+        stream.getTracks().forEach((track) => track.stop());
+      } catch {
+        newPermissions.camera = false;
+      }
+
+      try {
+        await navigator.clipboard.readText();
+        newPermissions.clipboard = true;
+      } catch {
+        newPermissions.clipboard = false;
+      }
+    }
+
+    setPermissions(newPermissions);
+    return newPermissions;
+  }, []);
+
+  const requestPermissions = async () => {
+    setIsCheckingPermissions(true);
+
+    try {
+      // Request camera permission
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: true,
+        });
+        stream.getTracks().forEach((track) => track.stop());
+        toast.success("Camera permission granted");
+      } catch (error) {
+        toast.error(
+          "Camera permission denied. Please allow camera access to continue."
+        );
+      }
+
+      // Request clipboard permission by attempting to read
+      try {
+        await navigator.clipboard.readText();
+        toast.success("Clipboard permission granted");
+      } catch (error) {
+        toast.error(
+          "Clipboard permission denied. Please allow clipboard access to continue."
+        );
+      }
+
+      // Recheck permissions after requests
+      await checkPermissions();
+    } catch (error) {
+      toast.error("Error requesting permissions");
+    } finally {
+      setIsCheckingPermissions(false);
+    }
+  };
+
+  // Check permissions on component mount
+  useEffect(() => {
+    checkPermissions();
+  }, [checkPermissions]);
+
   const handleStartExam = async () => {
+    // Check permissions before starting exam
+    const currentPermissions = await checkPermissions();
+
+    if (!currentPermissions.camera || !currentPermissions.clipboard) {
+      toast.error(
+        "Camera and clipboard permissions are required to start the exam"
+      );
+      return;
+    }
+
     setIsLoading(true);
     const fingerprint = await getFingerprint();
     const data = await takeExamAction({
@@ -161,6 +267,9 @@ export function ExamStartCountdown({ exam }: { exam: ExamData }) {
   const startDateTime = formatDateTime(exam.start_time);
   const endDateTime = formatDateTime(exam.end_time);
 
+  const canStartExam =
+    examStatus === "active" && permissions.camera && permissions.clipboard;
+
   if (examData && examStatus === "active") {
     return <QuizTakeWrapper examData={examData} examStatus={examStatus} />;
   }
@@ -190,6 +299,77 @@ export function ExamStartCountdown({ exam }: { exam: ExamData }) {
             )}
           </div>
         </div>
+
+        {/* Permissions Check */}
+        {(!permissions.camera || !permissions.clipboard) && (
+          <div className="bg-white rounded-lg shadow-lg border p-6">
+            <div className="text-center pb-4">
+              <h3 className="text-lg font-semibold flex items-center justify-center gap-2">
+                <AlertCircle className="h-5 w-5 text-orange-600" />
+                Required Permissions
+              </h3>
+              <p className="text-sm text-gray-600 mt-2">
+                The following permissions are required to take the exam
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+              <div
+                className={`flex items-center gap-3 p-4 rounded-lg border ${
+                  permissions.camera
+                    ? "bg-green-50 border-green-200 text-green-700"
+                    : "bg-red-50 border-red-200 text-red-700"
+                }`}
+              >
+                <Camera className="h-5 w-5" />
+                <div className="flex-1">
+                  <div className="font-medium">Camera Access</div>
+                  <div className="text-sm opacity-80">
+                    Required for proctoring
+                  </div>
+                </div>
+                {permissions.camera ? (
+                  <CheckCircle2 className="h-5 w-5 text-green-600" />
+                ) : (
+                  <XCircle className="h-5 w-5 text-red-600" />
+                )}
+              </div>
+
+              <div
+                className={`flex items-center gap-3 p-4 rounded-lg border ${
+                  permissions.clipboard
+                    ? "bg-green-50 border-green-200 text-green-700"
+                    : "bg-red-50 border-red-200 text-red-700"
+                }`}
+              >
+                <Clipboard className="h-5 w-5" />
+                <div className="flex-1">
+                  <div className="font-medium">Clipboard Access</div>
+                  <div className="text-sm opacity-80">
+                    Required for security
+                  </div>
+                </div>
+                {permissions.clipboard ? (
+                  <CheckCircle2 className="h-5 w-5 text-green-600" />
+                ) : (
+                  <XCircle className="h-5 w-5 text-red-600" />
+                )}
+              </div>
+            </div>
+
+            {(!permissions.camera || !permissions.clipboard) && (
+              <div className="text-center">
+                <Button
+                  onClick={requestPermissions}
+                  disabled={isCheckingPermissions}
+                  className="bg-orange-600 hover:bg-orange-700 text-white"
+                >
+                  {isCheckingPermissions ? "Checking..." : "Grant Permissions"}
+                </Button>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Status and Countdown */}
         <div className="bg-white rounded-lg shadow-lg border p-6">
@@ -304,14 +484,14 @@ export function ExamStartCountdown({ exam }: { exam: ExamData }) {
             <div className="text-center">
               <Button
                 onClick={handleStartExam}
-                disabled={examStatus !== "active" || isLoading}
+                disabled={!canStartExam || isLoading}
                 className={`px-8 py-3 text-lg font-semibold rounded-lg transition-all duration-300 ${
-                  examStatus === "active"
+                  canStartExam
                     ? "bg-green-600 hover:bg-green-700 text-white shadow-lg hover:shadow-xl transform hover:scale-105"
                     : "bg-gray-400 text-gray-200 cursor-not-allowed opacity-70"
                 }`}
               >
-                {examStatus === "active" ? (
+                {canStartExam ? (
                   <div className="flex items-center justify-center gap-2">
                     <Play className="h-5 w-5" />
                     {isLoading ? "Loading..." : "Start Exam"}
@@ -321,13 +501,26 @@ export function ExamStartCountdown({ exam }: { exam: ExamData }) {
                     <Lock className="h-5 w-5" />
                     Exam Not Started
                   </div>
-                ) : (
+                ) : examStatus === "ended" ? (
                   <div className="flex items-center justify-center gap-2">
                     <Lock className="h-5 w-5" />
                     Exam Ended
                   </div>
+                ) : (
+                  <div className="flex items-center justify-center gap-2">
+                    <Lock className="h-5 w-5" />
+                    Permissions Required
+                  </div>
                 )}
               </Button>
+
+              {examStatus === "active" &&
+                (!permissions.camera || !permissions.clipboard) && (
+                  <p className="text-sm text-red-600 mt-2">
+                    Camera and clipboard permissions are required to start the
+                    exam
+                  </p>
+                )}
             </div>
           </div>
         </div>
@@ -392,6 +585,7 @@ export function ExamStartCountdown({ exam }: { exam: ExamData }) {
             </div>
             <ul className="space-y-3">
               {[
+                "Camera and clipboard permissions are required for exam security",
                 "Read each question carefully before selecting your answer",
                 "Make sure you have a stable internet connection",
                 "The exam will auto-submit when time expires",
