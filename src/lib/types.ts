@@ -125,7 +125,7 @@ export interface QuestionAnalytics {
   question_text: string;
   total_attempts: number;
   correct_attempts: number;
-  success_rate: number; // percentage, e.g. 33.33
+  success_rate: number;
   option_1_count: number;
   option_2_count: number;
   option_3_count: number;
@@ -143,8 +143,6 @@ export interface DailyParticipantsCount {
   date: string; // YYYY-MM-DD
   count: number;
 }
-
-/* ─────────────────────────  Root Object  ─────────────────────── */
 
 export interface QuizAnalyticsType {
   exam_id: number;
@@ -175,4 +173,98 @@ export interface QuizAnalyticsType {
   question_analytics: QuestionAnalytics[];
   score_distribution: ScoreDistributionBucket[];
   daily_participants: DailyParticipantsCount[];
+}
+
+export type QuizDifficulty = "easy" | "medium" | "hard" | string;
+export type TrendLabel = "up" | "down" | "stable" | string;
+export type StrengthFlag = "strength" | "weakness" | string;
+
+export interface ActivitySummary {
+  total_exams_taken: number;
+  total_questions_answered: number;
+  total_correct_answers: number;
+  overall_accuracy: number; // %
+  active_days: number;
+  streak_current: number;
+  streak_longest: number;
+}
+
+export interface SubjectPerformance {
+  subject: string;
+  exams_taken: number;
+  average_score: number; // %
+  best_score: number; // %
+  worst_score: number; // %
+  improvement_trend: TrendLabel;
+}
+
+export interface DifficultyPerformance {
+  difficulty: QuizDifficulty;
+  exams_taken: number;
+  average_score: number; // %
+  success_rate: number; // %
+}
+
+export interface PerformanceTrend {
+  date: string; // YYYY-MM-DD
+  score: number; // %
+  exam_name: string;
+  exam_id: number;
+}
+
+export interface MonthlyProgress {
+  month: string; // YYYY-MM
+  average_score: number; // %
+  exams_count: number;
+}
+
+export interface ComparisonStats {
+  user_average: number; // %
+  global_average: number; // %
+  percentile_rank: number; // 0–100
+  better_than_percentage: number; // 0–100
+}
+
+export interface StrengthWeakness {
+  category: StrengthFlag;
+  subject: string;
+  average_score: number; // %
+  exams_count: number;
+  description: string;
+}
+
+export interface RecentExam {
+  id: number;
+  quiz_name: string;
+  quiz_difficulty: QuizDifficulty;
+  quiz_type: string;
+  quiz_created_at: string;
+  correct_answers: number;
+  ranking: number;
+  total_participants: number;
+  total_questions: number;
+  start_time: string;
+  end_time: string;
+}
+
+export interface UserAnalyticsType {
+  user_id: number;
+  username: string;
+
+  /* High-level activity */
+  activity_summary: ActivitySummary;
+  overall_average_score: number;
+
+  /* Breakdowns */
+  subject_performance: SubjectPerformance[];
+  difficulty_performance: DifficultyPerformance[];
+  performance_trends: PerformanceTrend[];
+  monthly_progress: MonthlyProgress[];
+
+  /* Benchmarks & insights */
+  comparison_stats: ComparisonStats;
+  strengths_weaknesses: StrengthWeakness[];
+
+  /* Latest exams */
+  recent_exams: RecentExam[];
 }

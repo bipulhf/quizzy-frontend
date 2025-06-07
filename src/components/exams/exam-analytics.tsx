@@ -10,14 +10,12 @@ import {
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import {
   FileQuestion,
   Users,
   Trophy,
   Clock,
   Calendar,
-  Download,
   ArrowLeft,
   BarChart3,
   Target,
@@ -192,58 +190,6 @@ export default function QuizAnalytics({
     );
   };
 
-  // Daily Participation Chart
-  const DailyParticipationChart = () => {
-    const maxParticipants = Math.max(
-      ...quizData.daily_participants.map((day) => day.count)
-    );
-
-    return (
-      <Card className="border-0 shadow-md">
-        <CardHeader>
-          <CardTitle className="text-lg font-semibold">
-            Daily Participation
-          </CardTitle>
-          <CardDescription>Number of participants per day</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {quizData.daily_participants.map((day, index) => (
-            <div key={index} className="space-y-2">
-              <div className="flex justify-between text-sm">
-                <span className="font-medium">
-                  {new Date(day.date).toLocaleDateString("en-US", {
-                    weekday: "short",
-                    month: "short",
-                    day: "numeric",
-                  })}
-                </span>
-                <span className="text-gray-600">{day.count} participants</span>
-              </div>
-              <div className="w-full bg-gray-200 rounded-full h-4">
-                <div
-                  className="bg-blue-600 h-4 rounded-full transition-all duration-500 flex items-center justify-end pr-2"
-                  style={{
-                    width:
-                      maxParticipants > 0
-                        ? `${(day.count / maxParticipants) * 100}%`
-                        : "0%",
-                    minWidth: day.count > 0 ? "30px" : "0px",
-                  }}
-                >
-                  {day.count > 0 && (
-                    <span className="text-white text-xs font-medium">
-                      {day.count}
-                    </span>
-                  )}
-                </div>
-              </div>
-            </div>
-          ))}
-        </CardContent>
-      </Card>
-    );
-  };
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50/30">
       <div className="container mx-auto p-4 md:p-6 lg:p-8 space-y-6">
@@ -265,13 +211,6 @@ export default function QuizAnalytics({
             <p className="text-gray-600">
               {quizData.exam_name} • Created by {quizData.exam_creator}
             </p>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <Button variant="outline" size="sm">
-              <Download className="h-4 w-4 mr-2" />
-              Export Report
-            </Button>
           </div>
         </div>
 
