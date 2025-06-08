@@ -50,7 +50,10 @@ export function QuizTakeWrapper({
   };
 
   useEffect(() => {
-    if (examStatus === "ended" || !isTabActive) {
+    if (
+      !isSubmitted &&
+      (examStatus === "ended" || (!isTabActive && examStatus === "active"))
+    ) {
       handleSubmitExam();
     }
   }, [examStatus, isTabActive]);

@@ -83,7 +83,7 @@ export function ExamRankings({
       <Card className="border-0 shadow-md">
         <CardHeader>
           <CardTitle className="text-lg font-semibold">
-            All Participants (24)
+            All Participants ({rankings.length})
           </CardTitle>
         </CardHeader>
         <CardContent>
