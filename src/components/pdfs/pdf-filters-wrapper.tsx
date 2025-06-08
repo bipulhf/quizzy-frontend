@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect, useMemo } from "react";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -9,17 +10,31 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Search } from "lucide-react";
-import { useState, useEffect } from "react";
 import { UploadType } from "@/lib/types";
+import { filterAndSortPDFs } from "./pdf-filters";
 
-interface PDFFiltersProps {
+interface PDFFiltersWrapperProps {
   pdfs: UploadType[];
+  onFilteredPDFsChange: (filteredPDFs: UploadType[]) => void;
 }
 
-export function PDFFilters({ pdfs }: PDFFiltersProps) {
+export function PDFFiltersWrapper({
+  pdfs,
+  onFilteredPDFsChange,
+}: PDFFiltersWrapperProps) {
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("all");
   const [sortBy, setSortBy] = useState("recent");
+
+  // Memoized filtered PDFs
+  const filteredPDFs = useMemo(() => {
+    return filterAndSortPDFs(pdfs, { search, status, sortBy });
+  }, [pdfs, search, status, sortBy]);
+
+  // Notify parent when filtered PDFs change
+  useEffect(() => {
+    onFilteredPDFsChange(filteredPDFs);
+  }, [filteredPDFs, onFilteredPDFsChange]);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearch(e.target.value);
@@ -74,54 +89,4 @@ export function PDFFilters({ pdfs }: PDFFiltersProps) {
       </div>
     </div>
   );
-}
-
-// Helper function to filter and sort PDFs based on filter criteria
-export function filterAndSortPDFs(
-  pdfs: UploadType[],
-  filters: {
-    search: string;
-    status: string;
-    sortBy: string;
-  }
-): UploadType[] {
-  let filteredPDFs = [...pdfs];
-
-  // Apply search filter
-  if (filters.search.trim()) {
-    const searchTerm = filters.search.toLowerCase().trim();
-    filteredPDFs = filteredPDFs.filter((pdf) =>
-      pdf.pdf_name.toLowerCase().includes(searchTerm)
-    );
-  }
-
-  // Apply status filter
-  if (filters.status !== "all") {
-    filteredPDFs = filteredPDFs.filter((pdf) => {
-      if (filters.status === "processed") {
-        return pdf.processing_state === 1;
-      } else if (filters.status === "processing") {
-        return pdf.processing_state === 0;
-      }
-      return true;
-    });
-  }
-
-  // Apply sorting
-  filteredPDFs.sort((a, b) => {
-    switch (filters.sortBy) {
-      case "recent":
-        return (
-          new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-        );
-      case "name":
-        return a.pdf_name.localeCompare(b.pdf_name);
-      case "pages":
-        return b.pages - a.pages;
-      default:
-        return 0;
-    }
-  });
-
-  return filteredPDFs;
 }

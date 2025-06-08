@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect, useMemo } from "react";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -9,17 +10,31 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Search } from "lucide-react";
-import { useState, useEffect } from "react";
 import { QuizType } from "@/lib/types";
+import { filterAndSortQuizzes } from "./quiz-filters";
 
-interface QuizFiltersProps {
+interface QuizFiltersWrapperProps {
   quizzes: QuizType[];
+  onFilteredQuizzesChange: (filteredQuizzes: QuizType[]) => void;
 }
 
-export function QuizFilters({ quizzes }: QuizFiltersProps) {
+export function QuizFiltersWrapper({
+  quizzes,
+  onFilteredQuizzesChange,
+}: QuizFiltersWrapperProps) {
   const [search, setSearch] = useState("");
   const [type, setType] = useState("all");
   const [sortBy, setSortBy] = useState("recent");
+
+  // Memoized filtered quizzes
+  const filteredQuizzes = useMemo(() => {
+    return filterAndSortQuizzes(quizzes, { search, type, sortBy });
+  }, [quizzes, search, type, sortBy]);
+
+  // Notify parent when filtered quizzes change
+  useEffect(() => {
+    onFilteredQuizzesChange(filteredQuizzes);
+  }, [filteredQuizzes, onFilteredQuizzesChange]);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearch(e.target.value);
@@ -76,60 +91,4 @@ export function QuizFilters({ quizzes }: QuizFiltersProps) {
       </div>
     </div>
   );
-}
-
-// Helper function to filter and sort quizzes based on filter criteria
-export function filterAndSortQuizzes(
-  quizzes: QuizType[],
-  filters: {
-    search: string;
-    type: string;
-    sortBy: string;
-  }
-): QuizType[] {
-  let filteredQuizzes = [...quizzes];
-
-  // Apply search filter
-  if (filters.search.trim()) {
-    const searchTerm = filters.search.toLowerCase().trim();
-    filteredQuizzes = filteredQuizzes.filter(
-      (quiz) =>
-        quiz.name.toLowerCase().includes(searchTerm) ||
-        (quiz.topic && quiz.topic.toLowerCase().includes(searchTerm))
-    );
-  }
-
-  // Apply type filter
-  if (filters.type !== "all") {
-    filteredQuizzes = filteredQuizzes.filter((quiz) => {
-      if (filters.type === "topic") {
-        return quiz.quiz_type === "topic";
-      } else if (filters.type === "page_range") {
-        return quiz.quiz_type === "page_range";
-      } else if (filters.type === "multi") {
-        return quiz.uploads && quiz.uploads.length > 1;
-      }
-      return true;
-    });
-  }
-
-  // Apply sorting
-  filteredQuizzes.sort((a, b) => {
-    switch (filters.sortBy) {
-      case "recent":
-        return (
-          new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-        );
-      case "name":
-        return a.name.localeCompare(b.name);
-      case "participants":
-        return b.participants_count - a.participants_count;
-      case "questions":
-        return b.questions_count - a.questions_count;
-      default:
-        return 0;
-    }
-  });
-
-  return filteredQuizzes;
 }
