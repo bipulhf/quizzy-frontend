@@ -72,7 +72,6 @@ export function QuizFiltersWrapper({
               <SelectItem value="all">All Types</SelectItem>
               <SelectItem value="topic">Topic-based</SelectItem>
               <SelectItem value="page_range">Page Range</SelectItem>
-              <SelectItem value="multi">Multi-PDF</SelectItem>
             </SelectContent>
           </Select>
 

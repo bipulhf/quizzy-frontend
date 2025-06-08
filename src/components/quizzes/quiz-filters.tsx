@@ -9,14 +9,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Search } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { QuizType } from "@/lib/types";
 
-interface QuizFiltersProps {
-  quizzes: QuizType[];
-}
-
-export function QuizFilters({ quizzes }: QuizFiltersProps) {
+export function QuizFilters() {
   const [search, setSearch] = useState("");
   const [type, setType] = useState("all");
   const [sortBy, setSortBy] = useState("recent");
@@ -57,7 +53,6 @@ export function QuizFilters({ quizzes }: QuizFiltersProps) {
               <SelectItem value="all">All Types</SelectItem>
               <SelectItem value="topic">Topic-based</SelectItem>
               <SelectItem value="page_range">Page Range</SelectItem>
-              <SelectItem value="multi">Multi-PDF</SelectItem>
             </SelectContent>
           </Select>
 

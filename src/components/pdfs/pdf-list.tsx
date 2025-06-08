@@ -20,11 +20,8 @@ import {
 import { UploadType } from "@/lib/types";
 import { deleteUploadAction } from "@/action/uploads.action";
 import { toast } from "sonner";
-import { useRouter } from "next/navigation";
 
 export function PDFList({ uploads }: { uploads: UploadType[] }) {
-  const router = useRouter();
-
   return (
     <Card className="border-0 shadow-md">
       <CardHeader>
@@ -137,10 +134,12 @@ export function PDFList({ uploads }: { uploads: UploadType[] }) {
                         onClick={async () => {
                           toast.promise(deleteUploadAction({ id: upload.id }), {
                             loading: "Deleting PDF...",
-                            success: "PDF deleted successfully",
+                            success: () => {
+                              window.location.reload();
+                              return "PDF deleted successfully";
+                            },
                             error: "Failed to delete PDF",
                           });
-                          router.refresh();
                         }}
                       >
                         <Trash2 className="h-4 w-4 mr-2" />

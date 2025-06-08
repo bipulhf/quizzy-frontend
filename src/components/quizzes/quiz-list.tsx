@@ -174,11 +174,13 @@ export function QuizList({ quizzes }: { quizzes: QuizType[] }) {
                             }),
                             {
                               loading: "Creating Quiz...",
-                              success: "Quiz created successfully",
+                              success: () => {
+                                window.location.reload();
+                                return "Quiz created successfully";
+                              },
                               error: `Failed to create Quiz ${quiz.name}`,
                             }
                           );
-                          router.refresh();
                         }}
                       >
                         <Copy className="h-4 w-4 mr-2" />
@@ -211,10 +213,12 @@ export function QuizList({ quizzes }: { quizzes: QuizType[] }) {
                         onClick={async () => {
                           toast.promise(deleteQuizAction({ id: quiz.id }), {
                             loading: "Deleting Quiz...",
-                            success: "Quiz deleted successfully",
+                            success: () => {
+                              window.location.reload();
+                              return "Quiz deleted successfully";
+                            },
                             error: "Failed to delete Quiz",
                           });
-                          router.refresh();
                         }}
                       >
                         <Trash2 className="h-4 w-4 mr-2" />

@@ -46,7 +46,7 @@ export function QuizzesHeader({ pdfs }: { pdfs: UploadType[] }) {
         isOpen={isCreateQuizModalOpen}
         onClose={() => setIsCreateQuizModalOpen(false)}
         onSuccess={handleQuizCreated}
-        pdfs={pdfs}
+        pdfs={pdfs.filter((pdf) => pdf.processing_state === 1)}
       />
     </div>
   );

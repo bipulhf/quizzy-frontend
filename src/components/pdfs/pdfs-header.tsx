@@ -7,11 +7,9 @@ import { useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { uploadPdfAction } from "@/action/uploads.action";
 import { toast } from "sonner";
-import { useRouter } from "next/navigation";
 
 export function PDFsHeader() {
   const searchParams = useSearchParams();
-  const router = useRouter();
 
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(
     searchParams.get("modal") === "true"
@@ -27,7 +25,7 @@ export function PDFsHeader() {
       }
       setIsUploadModalOpen(false);
       toast.success("PDFs uploaded successfully");
-      router.refresh();
+      window.location.reload();
     })();
   };
   return (

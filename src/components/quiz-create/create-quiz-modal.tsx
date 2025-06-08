@@ -37,7 +37,6 @@ import { Separator } from "../ui/separator";
 import { UploadType } from "@/lib/types";
 import { createQuizAction } from "@/action/quiz.action";
 import { formatDateTime } from "@/utils/date";
-import { useRouter } from "next/navigation";
 
 interface CreateQuizModalProps {
   isOpen: boolean;
@@ -65,7 +64,6 @@ export function CreateQuizModal({
   const [retake, setRetake] = useState(false);
   const [difficulty, setDifficulty] = useState("easy");
   const [questions_count, setQuestionsCount] = useState(10);
-  const router = useRouter();
 
   // Search and filter states
   const [searchQuery, setSearchQuery] = useState("");
@@ -207,7 +205,7 @@ export function CreateQuizModal({
       }
 
       handleClose();
-      router.push("/dashboard/quizzes");
+      window.location.href = "/dashboard/quizzes";
     } catch (error) {
       toast("Failed to Create Quiz");
     } finally {
@@ -469,7 +467,10 @@ export function CreateQuizModal({
                     </span>
                   </div>
                 </SelectItem>
-                <SelectItem value="page_range">
+                <SelectItem
+                  value="page_range"
+                  disabled={selectedPDFs.length > 1}
+                >
                   <div className="flex flex-col items-start">
                     <span className="font-medium">Page Range Quiz</span>
                     <span className="text-xs text-gray-500">
