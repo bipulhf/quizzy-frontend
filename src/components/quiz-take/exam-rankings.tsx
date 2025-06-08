@@ -2,51 +2,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Trophy, Medal, Award, User } from "lucide-react";
 
-const rankings = [
-  {
-    rank: 1,
-    name: "Alice Johnson",
-    score: 15,
-    percentage: 100,
-    timeSpent: "28:30",
-    avatar: "/placeholder.svg?height=40&width=40",
-  },
-  {
-    rank: 2,
-    name: "Bob Smith",
-    score: 14,
-    percentage: 93,
-    timeSpent: "35:15",
-    avatar: "/placeholder.svg?height=40&width=40",
-  },
-  {
-    rank: 3,
-    name: "You",
-    score: 12,
-    percentage: 80,
-    timeSpent: "32:45",
-    avatar: "/placeholder.svg?height=40&width=40",
-    isCurrentUser: true,
-  },
-  {
-    rank: 4,
-    name: "Carol Davis",
-    score: 12,
-    percentage: 80,
-    timeSpent: "40:20",
-    avatar: "/placeholder.svg?height=40&width=40",
-  },
-  {
-    rank: 5,
-    name: "David Wilson",
-    score: 11,
-    percentage: 73,
-    timeSpent: "38:45",
-    avatar: "/placeholder.svg?height=40&width=40",
-  },
-];
-
-export function ExamRankings() {
+export function ExamRankings({
+  rankings,
+  isLoading,
+}: {
+  rankings: { id: number; username: string; correct_answers: number }[];
+  isLoading: boolean;
+}) {
   const getRankIcon = (rank: number) => {
     switch (rank) {
       case 1:
@@ -73,6 +35,10 @@ export function ExamRankings() {
     }
   };
 
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <div className="space-y-6">
       {/* Top 3 Podium */}
@@ -86,34 +52,27 @@ export function ExamRankings() {
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
             {rankings.slice(0, 3).map((participant, index) => (
               <div
-                key={participant.rank}
+                key={participant.id + "_" + index}
                 className={`${
-                  index === 0 ? "col-span-2" : ""
+                  index === 0 ? "max-md:col-span-2" : ""
                 } text-center p-4 rounded-lg border-2 ${
-                  participant.isCurrentUser
+                  participant.id === rankings[0].id
                     ? "bg-blue-50 border-blue-300"
-                    : getRankColor(participant.rank)
+                    : getRankColor(index + 1)
                 }`}
               >
                 <div className="flex justify-center mb-2">
-                  {getRankIcon(participant.rank)}
+                  {getRankIcon(index + 1)}
                 </div>
                 <div className="w-12 h-12 bg-gray-200 rounded-full mx-auto mb-2 flex items-center justify-center">
                   <User className="h-6 w-6 text-gray-600" />
                 </div>
                 <h3 className="font-semibold text-gray-900">
-                  {participant.name}
+                  {participant.username}
                 </h3>
                 <p className="text-2xl font-bold text-gray-900">
-                  {participant.percentage}%
+                  {participant.correct_answers} correct
                 </p>
-                <p className="text-sm text-gray-600">
-                  {participant.score}/15 correct
-                </p>
-                <p className="text-xs text-gray-500">{participant.timeSpent}</p>
-                {participant.isCurrentUser && (
-                  <Badge className="mt-2 bg-blue-100 text-blue-700">You</Badge>
-                )}
               </div>
             ))}
           </div>
@@ -129,22 +88,22 @@ export function ExamRankings() {
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
-            {rankings.map((participant) => (
+            {rankings.map((participant, index) => (
               <div
-                key={participant.rank}
+                key={participant.id + "_" + index}
                 className={`flex items-center justify-between p-4 rounded-lg border ${
-                  participant.isCurrentUser
+                  participant.id === rankings[0].id
                     ? "bg-blue-50 border-blue-300 ring-2 ring-blue-200"
                     : "bg-white border-gray-200 hover:bg-gray-50"
                 }`}
               >
                 <div className="flex items-center gap-4">
                   <div className="flex items-center justify-center w-8">
-                    {participant.rank <= 3 ? (
-                      getRankIcon(participant.rank)
+                    {index + 1 <= 3 ? (
+                      getRankIcon(index + 1)
                     ) : (
                       <span className="text-gray-600 font-medium">
-                        #{participant.rank}
+                        #{index + 1}
                       </span>
                     )}
                   </div>
@@ -156,9 +115,9 @@ export function ExamRankings() {
                   <div>
                     <div className="flex items-center gap-2">
                       <h3 className="font-medium text-gray-900">
-                        {participant.name}
+                        {participant.username}
                       </h3>
-                      {participant.isCurrentUser && (
+                      {participant.id === rankings[0].id && (
                         <Badge
                           variant="outline"
                           className="bg-blue-100 text-blue-700 border-blue-300"
@@ -168,14 +127,8 @@ export function ExamRankings() {
                       )}
                     </div>
                     <p className="text-sm text-gray-600">
-                      {participant.score}/15 correct • {participant.timeSpent}
+                      {participant.correct_answers}/15 correct
                     </p>
-                  </div>
-                </div>
-
-                <div className="text-right">
-                  <div className="text-xl font-bold text-gray-900">
-                    {participant.percentage}%
                   </div>
                 </div>
               </div>

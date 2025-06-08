@@ -7,7 +7,7 @@ import { QuestionsList as ExamQuestionsList } from "@/components/quiz-take/quest
 import { ExamResults } from "@/components/quiz-take/exam-results";
 import { ExamRankings } from "@/components/quiz-take/exam-rankings";
 import { TakeExamType } from "@/lib/types";
-import { submitExamAction } from "@/action/exam.action";
+import { getExamRankingsAction, submitExamAction } from "@/action/exam.action";
 import { toast } from "sonner";
 import useTabActive from "@/hooks/useTabActive";
 
@@ -27,6 +27,10 @@ export function QuizTakeWrapper({
   >([]);
   const [score, setScore] = useState<number>(0);
   const isTabActive = useTabActive();
+  const [isFetchingRankings, setIsFetchingRankings] = useState(false);
+  const [rankings, setRankings] = useState<
+    { id: number; username: string; correct_answers: number }[]
+  >([]);
 
   const handleSubmitExam = async () => {
     setIsSubmitted(true);
@@ -50,6 +54,23 @@ export function QuizTakeWrapper({
       handleSubmitExam();
     }
   }, [examStatus, isTabActive]);
+
+  useEffect(() => {
+    const fetchRankings = async () => {
+      setIsFetchingRankings(true);
+      if (currentView === "rankings") {
+        const rankingsResponse = await getExamRankingsAction(examData.exam.id);
+        if (!rankingsResponse.success) {
+          toast.error(rankingsResponse.error);
+          return;
+        }
+        const rankingsData = rankingsResponse.data;
+        setRankings(rankingsData);
+      }
+      setIsFetchingRankings(false);
+    };
+    fetchRankings();
+  }, [currentView]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50/30">
@@ -100,7 +121,9 @@ export function QuizTakeWrapper({
           />
         )}
 
-        {currentView === "rankings" && isSubmitted && <ExamRankings />}
+        {currentView === "rankings" && isSubmitted && (
+          <ExamRankings rankings={rankings} isLoading={isFetchingRankings} />
+        )}
       </div>
     </div>
   );

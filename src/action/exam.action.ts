@@ -201,3 +201,42 @@ export async function getExamAnswersAction(takes_id: number) {
     };
   }
 }
+
+export async function getExamRankingsAction(exam_id: number) {
+  try {
+    const cookieStore = await cookies();
+    const response = await fetch(`${API_URL}/rankings/${exam_id}`, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${cookieStore.get("token")?.value}`,
+      },
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(
+        typeof error.detail === "string"
+          ? error.detail
+          : "Failed to fetch exam rankings"
+      );
+    }
+
+    const data = await response.json();
+
+    return {
+      success: true,
+      data,
+    };
+  } catch (e) {
+    if (e instanceof Error) {
+      return {
+        success: false,
+        error: e.message,
+      };
+    }
+    return {
+      success: false,
+      error: "An unknown error occurred",
+    };
+  }
+}
