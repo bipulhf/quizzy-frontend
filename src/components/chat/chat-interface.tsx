@@ -11,35 +11,39 @@ import { ChatMessage } from "./chat-message";
 import { PdfReferenceModal } from "./pdf-reference-modal";
 import { listUploadsAction } from "@/action/uploads.action";
 import { UploadType } from "@/lib/types";
+import { PdfReference } from "@/hooks/use-chat-store"; // Import PdfReference
 
 interface ChatInterfaceProps {
   chatId: string;
 }
 
-interface PdfReference {
-  id: string;
-  name: string;
-}
 
 export function ChatInterface({ chatId }: ChatInterfaceProps) {
   const [message, setMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [showPdfModal, setShowPdfModal] = useState(false);
-  const [pdfReferences, setPdfReferences] = useState<PdfReference[]>([]);
+  // const [pdfReferences, setPdfReferences] = useState<PdfReference[]>([]); // Ensured local state is removed/commented
   const [availablePdfs, setAvailablePdfs] = useState<any[]>([]);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const scrollAreaRef = useRef<HTMLDivElement>(null); // Ref for ScrollArea component
 
-  const { chats, addMessage, updateMessage } = useChatStore();
+  const { chats, addMessage, updateMessage, updateChatPdfReferences } = useChatStore(); // Added updateChatPdfReferences
   const currentChat = chats.find((chat) => chat.id === chatId);
 
   useEffect(() => {
     loadAvailablePdfs();
   }, []);
 
+  // Removed useEffect that scrolled on every currentChat.messages change
+
   useEffect(() => {
-    scrollToBottom();
-  }, [currentChat?.messages]);
+    // When switching to a new chat, scroll to the bottom.
+    // A small delay can help ensure content is rendered and scroll position is calculated correctly.
+    if (messagesEndRef.current) {
+      setTimeout(() => forceScrollToBottom(), 50);
+    }
+  }, [chatId]);
 
   const loadAvailablePdfs = async () => {
     try {
@@ -52,8 +56,28 @@ export function ChatInterface({ chatId }: ChatInterfaceProps) {
     }
   };
 
-  const scrollToBottom = () => {
+  const forceScrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  const SCROLL_THRESHOLD = 50; // pixels
+  const conditionalScrollToBottom = () => {
+    const scrollAreaRoot = scrollAreaRef.current;
+    if (scrollAreaRoot) {
+      // For shadcn/ui ScrollArea, the viewport is a child with a specific data attribute
+      const viewport = scrollAreaRoot.querySelector('[data-radix-scroll-area-viewport]') as HTMLDivElement;
+      if (viewport) {
+        const { scrollHeight, scrollTop, clientHeight } = viewport;
+        // If the user is within SCROLL_THRESHOLD of the bottom, then scroll.
+        if (scrollHeight - scrollTop <= clientHeight + SCROLL_THRESHOLD) {
+          messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+        }
+      } else {
+        // Fallback if viewport not found (e.g., structure changed or error in selector)
+        // console.warn("Scroll viewport not found, falling back to force scroll for safety.");
+        forceScrollToBottom();
+      }
+    }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -73,12 +97,16 @@ export function ChatInterface({ chatId }: ChatInterfaceProps) {
       id: pdf.pdf_id,
       name: pdf.pdf_name,
     };
-    setPdfReferences((prev) => [...prev, reference]);
+    const currentReferences = currentChat?.pdfReferences || [];
+    if (!currentReferences.find(ref => ref.id === reference.id)) {
+      updateChatPdfReferences(chatId, [...currentReferences, reference]);
+    }
     setShowPdfModal(false);
   };
 
   const removePdfReference = (id: string) => {
-    setPdfReferences((prev) => prev.filter((ref) => ref.id !== id));
+    const currentReferences = currentChat?.pdfReferences || [];
+    updateChatPdfReferences(chatId, currentReferences.filter((ref) => ref.id !== id));
   };
 
   const handleSendMessage = async () => {
@@ -93,12 +121,10 @@ export function ChatInterface({ chatId }: ChatInterfaceProps) {
       content: userMessage,
       role: "user",
     });
+    forceScrollToBottom(); // Scroll when user sends a message
 
     // Create assistant message placeholder
-    const assistantMessageId = Date.now().toString();
-    console.log("Creating assistant message with ID:", assistantMessageId);
-
-    addMessage(chatId, {
+    const assistantMessageId = addMessage(chatId, {
       content: "",
       role: "assistant",
       isStreaming: true,
@@ -114,7 +140,7 @@ export function ChatInterface({ chatId }: ChatInterfaceProps) {
 
       // Prepare request data
       const requestData = {
-        pdf_ids: pdfReferences.map((ref) => ref.id),
+        pdf_ids: currentChat?.pdfReferences?.map((ref) => ref.id) || [],
         message: userMessage,
         conversation_history: conversationHistory.slice(0, -2),
       };
@@ -181,6 +207,7 @@ export function ChatInterface({ chatId }: ChatInterfaceProps) {
                     assistantMessageId,
                     `*${currentStatus}*`
                   );
+                  conditionalScrollToBottom(); // Conditional scroll during streaming status updates
                 }
               } else if (parsedData.type === "sources") {
                 sources = parsedData.data;
@@ -192,6 +219,7 @@ export function ChatInterface({ chatId }: ChatInterfaceProps) {
                     : "";
                 console.log("Updating message with sources:", sourceText);
                 updateMessage(chatId, assistantMessageId, sourceText);
+                conditionalScrollToBottom(); // Conditional scroll during streaming source updates
               } else if (parsedData.type === "content") {
                 isGeneratingResponse = true;
                 fullResponse += parsedData.data;
@@ -243,41 +271,41 @@ export function ChatInterface({ chatId }: ChatInterfaceProps) {
     } finally {
       console.log("Setting loading to false");
       setIsLoading(false);
-      setPdfReferences([]);
+      // Removed setPdfReferences([]) as it's store-managed
     }
-  };
+  }; // This is the correct end of handleSendMessage
 
-  return (
-    <div className="flex flex-col h-full">
-      {/* Chat Header */}
-      <div className="p-4 border-b border-gray-200 bg-white">
-        <h2 className="font-semibold text-lg">
-          {currentChat?.title || "Chat"}
-        </h2>
-        {pdfReferences.length > 0 && (
-          <div className="flex flex-wrap gap-2 mt-2">
-            {pdfReferences.map((ref) => (
-              <Badge
-                key={ref.id}
-                variant="secondary"
-                className="flex items-center gap-1"
+return (
+  <div className="flex flex-col h-full">
+    {/* Chat Header */}
+    <div className="p-4 border-b border-gray-200 bg-white">
+      <h2 className="text-sm font-semibold text-gray-600">
+        PDF References
+      </h2>
+      {currentChat?.pdfReferences && currentChat.pdfReferences.length > 0 && (
+        <div className="flex flex-wrap gap-2 mt-2">
+          {currentChat?.pdfReferences?.map((ref) => (
+            <Badge
+              key={ref.id}
+              variant="secondary"
+              className="flex items-center gap-1"
+            >
+              <File className="w-3 h-3" />
+              {ref.name}
+              <button
+                onClick={() => removePdfReference(ref.id)}
+                className="ml-1 hover:text-red-500"
               >
-                <File className="w-3 h-3" />
-                {ref.name}
-                <button
-                  onClick={() => removePdfReference(ref.id)}
-                  className="ml-1 hover:text-red-500"
-                >
-                  <X className="w-3 h-3" />
-                </button>
-              </Badge>
+                <X className="w-3 h-3" />
+              </button>
+            </Badge>
             ))}
           </div>
         )}
       </div>
 
       {/* Messages */}
-      <ScrollArea className="flex-1 p-4">
+      <ScrollArea className="flex-1 p-4" ref={scrollAreaRef}>
         <div className="space-y-4">
           {currentChat?.messages.map((msg) => (
             <ChatMessage key={msg.id} message={msg} />
