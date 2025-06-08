@@ -4,13 +4,13 @@ import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Send, File, X } from "lucide-react";
-import { useChatStore, Message } from "@/hooks/use-chat-store";
-import { listUploadsAction } from "@/action/uploads.action";
+import { useChatStore } from "@/hooks/use-chat-store";
 import { ChatMessage } from "./chat-message";
 import { PdfReferenceModal } from "./pdf-reference-modal";
+import { listUploadsAction } from "@/action/uploads.action";
+import { UploadType } from "@/lib/types";
 
 interface ChatInterfaceProps {
   chatId: string;
@@ -68,9 +68,9 @@ export function ChatInterface({ chatId }: ChatInterfaceProps) {
     }
   };
 
-  const handlePdfSelect = (pdf: any) => {
+  const handlePdfSelect = (pdf: UploadType) => {
     const reference: PdfReference = {
-      id: pdf.id,
+      id: pdf.pdf_id,
       name: pdf.pdf_name,
     };
     setPdfReferences((prev) => [...prev, reference]);
@@ -96,6 +96,8 @@ export function ChatInterface({ chatId }: ChatInterfaceProps) {
 
     // Create assistant message placeholder
     const assistantMessageId = Date.now().toString();
+    console.log("Creating assistant message with ID:", assistantMessageId);
+
     addMessage(chatId, {
       content: "",
       role: "assistant",
@@ -114,11 +116,17 @@ export function ChatInterface({ chatId }: ChatInterfaceProps) {
       const requestData = {
         pdf_ids: pdfReferences.map((ref) => ref.id),
         message: userMessage,
-        conversation_history: conversationHistory.slice(0, -2), // Exclude the last two messages we just added
+        conversation_history: conversationHistory.slice(0, -2),
       };
 
+      console.log(
+        "Making request to:",
+        "http://localhost:8001/pdf/chat/stream"
+      );
+      console.log("Request data:", requestData);
+
       // Make streaming request
-      const response = await fetch("http://localhost:8001/chat/stream", {
+      const response = await fetch("http://localhost:8001/pdf/chat/stream", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -127,8 +135,11 @@ export function ChatInterface({ chatId }: ChatInterfaceProps) {
       });
 
       if (!response.ok) {
+        console.error("Response not OK:", response.status, response.statusText);
         throw new Error("Failed to get response");
       }
+
+      console.log("Response OK, starting to read stream...");
 
       const reader = response.body?.getReader();
       if (!reader) {
@@ -136,10 +147,16 @@ export function ChatInterface({ chatId }: ChatInterfaceProps) {
       }
 
       let fullResponse = "";
+      let currentStatus = "";
+      let sources: string[] = [];
+      let isGeneratingResponse = false;
 
       while (true) {
         const { done, value } = await reader.read();
-        if (done) break;
+        if (done) {
+          console.log("Stream finished");
+          break;
+        }
 
         const chunk = new TextDecoder().decode(value);
         const lines = chunk.split("\n");
@@ -147,20 +164,75 @@ export function ChatInterface({ chatId }: ChatInterfaceProps) {
         for (const line of lines) {
           if (line.startsWith("data: ")) {
             try {
-              const data = JSON.parse(line.slice(6));
-              if (data.content) {
-                fullResponse += data.content;
-                updateMessage(chatId, assistantMessageId, fullResponse);
+              const parsedData = JSON.parse(line.slice(6));
+              console.log("Parsed streaming data:", parsedData);
+
+              if (parsedData.type === "status") {
+                currentStatus = parsedData.data;
+                console.log("Status update:", currentStatus);
+
+                if (!isGeneratingResponse) {
+                  console.log(
+                    "Updating message with status:",
+                    `*${currentStatus}*`
+                  );
+                  updateMessage(
+                    chatId,
+                    assistantMessageId,
+                    `*${currentStatus}*`
+                  );
+                }
+              } else if (parsedData.type === "sources") {
+                sources = parsedData.data;
+                console.log("Sources received:", sources);
+
+                const sourceText =
+                  sources.length > 0
+                    ? `**Sources:** ${sources.join(", ")}\n\n`
+                    : "";
+                console.log("Updating message with sources:", sourceText);
+                updateMessage(chatId, assistantMessageId, sourceText);
+              } else if (parsedData.type === "content") {
+                isGeneratingResponse = true;
+                fullResponse += parsedData.data;
+
+                let displayMessage = "";
+                if (sources.length > 0) {
+                  displayMessage += `**Sources:** ${sources.join(", ")}\n\n`;
+                }
+                displayMessage += fullResponse;
+
+                console.log(
+                  "Content chunk received. Full response so far:",
+                  fullResponse
+                );
+                console.log(
+                  "Updating message with:",
+                  displayMessage.substring(0, 100) + "..."
+                );
+
+                updateMessage(chatId, assistantMessageId, displayMessage);
+              } else if (parsedData.type === "done") {
+                console.log("Stream done, finalizing message");
+
+                let finalMessage = "";
+                if (sources.length > 0) {
+                  finalMessage += `**Sources:** ${sources.join(", ")}\n\n`;
+                }
+                finalMessage += fullResponse;
+
+                console.log("Final message:", finalMessage);
+                updateMessage(chatId, assistantMessageId, finalMessage);
+                break;
               }
             } catch (e) {
-              // Ignore malformed JSON
+              console.warn("Failed to parse streaming data:", line, e);
             }
           }
         }
       }
 
-      // Mark streaming as complete
-      updateMessage(chatId, assistantMessageId, fullResponse);
+      console.log("Stream processing complete");
     } catch (error) {
       console.error("Chat error:", error);
       updateMessage(
@@ -169,8 +241,9 @@ export function ChatInterface({ chatId }: ChatInterfaceProps) {
         "Sorry, I encountered an error. Please try again."
       );
     } finally {
+      console.log("Setting loading to false");
       setIsLoading(false);
-      setPdfReferences([]); // Clear references after sending
+      setPdfReferences([]);
     }
   };
 
