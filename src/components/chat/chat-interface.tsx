@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
-import { Send, File, X } from "lucide-react";
+import { Send, File, X, Paperclip, Loader2 } from "lucide-react"; // Added Paperclip and Loader2 icons
 import { useChatStore } from "@/hooks/use-chat-store";
 import { ChatMessage } from "./chat-message";
 import { PdfReferenceModal } from "./pdf-reference-modal";
@@ -16,7 +16,6 @@ import { PdfReference } from "@/hooks/use-chat-store"; // Import PdfReference
 interface ChatInterfaceProps {
   chatId: string;
 }
-
 
 export function ChatInterface({ chatId }: ChatInterfaceProps) {
   const [message, setMessage] = useState("");
@@ -275,37 +274,47 @@ export function ChatInterface({ chatId }: ChatInterfaceProps) {
     }
   }; // This is the correct end of handleSendMessage
 
-return (
-  <div className="flex flex-col h-full">
-    {/* Chat Header */}
-    <div className="p-4 border-b border-gray-200 bg-white">
-      <h2 className="text-sm font-semibold text-gray-600">
-        PDF References
-      </h2>
-      {currentChat?.pdfReferences && currentChat.pdfReferences.length > 0 && (
-        <div className="flex flex-wrap gap-2 mt-2">
-          {currentChat?.pdfReferences?.map((ref) => (
-            <Badge
-              key={ref.id}
-              variant="secondary"
-              className="flex items-center gap-1"
-            >
-              <File className="w-3 h-3" />
-              {ref.name}
-              <button
-                onClick={() => removePdfReference(ref.id)}
-                className="ml-1 hover:text-red-500"
-              >
-                <X className="w-3 h-3" />
-              </button>
-            </Badge>
-            ))}
+  return (
+    <div className="flex flex-col flex-1 bg-gray-50 overflow-hidden p-4 gap-3"> {/* Changed h-full to h-screen and added bg color */}
+      {/* Chat Header */}
+      <div className="p-3 border-b border-gray-200 bg-white shadow-sm sticky top-0 z-10">
+        {/* Chat Title Row */}
+        <div className="flex justify-between items-center mb-2">
+          <h2 className="font-semibold text-lg text-gray-800">
+            {currentChat?.title || "Chat"}
+          </h2>
+          {/* You can add other elements here if they should be aligned with the title */}
+        </div>
+
+        {/* PDF References Section */}
+        {currentChat?.pdfReferences && currentChat.pdfReferences.length > 0 && (
+          <div className="mb-1">
+            <h3 className="text-xs font-medium text-gray-500 mb-1">Active PDF References:</h3>
+            <div className="flex flex-wrap gap-2 mt-1">
+              {currentChat.pdfReferences.map((ref) => (
+                <Badge
+                  key={ref.id}
+                  variant="outline"
+                  className="flex items-center gap-1.5 py-1 px-2 border-blue-500 text-blue-700 bg-blue-50"
+                >
+                  <File className="w-3.5 h-3.5" />
+                  <span className="text-xs font-medium">{ref.name}</span>
+                  <button
+                    onClick={() => removePdfReference(ref.id)}
+                    className="ml-1 p-0.5 rounded-full hover:bg-blue-200"
+                    aria-label={`Remove ${ref.name} reference`}
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                </Badge>
+              ))}
+            </div>
           </div>
         )}
       </div>
 
       {/* Messages */}
-      <ScrollArea className="flex-1 p-4" ref={scrollAreaRef}>
+      <ScrollArea className="flex-1 p-4 bg-gray-100 min-h-0 rounded-md" ref={scrollAreaRef}> {/* Added bg color to message area */}
         <div className="space-y-4">
           {currentChat?.messages.map((msg) => (
             <ChatMessage key={msg.id} message={msg} />
@@ -315,25 +324,39 @@ return (
       </ScrollArea>
 
       {/* Input Area */}
-      <div className="p-4 border-t border-gray-200 bg-white">
-        <div className="flex gap-2">
-          <div className="flex-1">
-            <Textarea
-              ref={textareaRef}
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              onKeyPress={handleKeyPress}
-              placeholder="Type your message... (Use @ to reference PDFs)"
-              className="resize-none"
-              rows={3}
-            />
-          </div>
+      <div className="p-3 border-t border-gray-200 bg-white sticky bottom-0 z-10 shadow-t"> {/* Adjusted padding, sticky, shadow */}
+        <div className="flex items-end gap-2"> {/* items-end for better alignment with multi-line textarea */}
+          <Button 
+            variant="outline" 
+            size="icon" 
+            onClick={() => setShowPdfModal(true)}
+            className="flex-shrink-0 border-gray-300 hover:bg-gray-100"
+            aria-label="Attach PDF"
+          >
+            <Paperclip className="w-5 h-5 text-gray-600" />
+          </Button>
+          <Textarea
+            ref={textareaRef}
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            onKeyPress={handleKeyPress}
+            placeholder="Type your message... (Use @ or click paperclip to reference PDFs)"
+            className="flex-1 resize-none border-gray-300 focus:ring-blue-500 focus:border-blue-500 min-h-[40px] max-h-[120px] text-sm p-2"
+            rows={1} // Start with 1 row, auto-expands with content
+            onInput={(e) => {
+              const target = e.target as HTMLTextAreaElement;
+              target.style.height = 'inherit';
+              target.style.height = `${target.scrollHeight}px`;
+            }}
+          />
           <Button
             onClick={handleSendMessage}
             disabled={!message.trim() || isLoading}
-            size="lg"
+            size="icon"
+            className="flex-shrink-0 bg-blue-600 hover:bg-blue-700 text-white rounded-md w-10 h-10"
+            aria-label="Send message"
           >
-            <Send className="w-4 h-4" />
+            {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" />}
           </Button>
         </div>
       </div>
