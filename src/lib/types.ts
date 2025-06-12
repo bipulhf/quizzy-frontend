@@ -16,6 +16,7 @@ export type DashboardInfoType = {
   total_exam_participated: number;
   recent_pdfs: UploadType[];
   recent_quizzes: QuizType[];
+  credits: number;
 };
 
 export type QuestionType = {
