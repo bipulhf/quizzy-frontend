@@ -13,7 +13,7 @@ export default async function RootLayout({
     <div className="">
       <Navbar isLoggedIn={isLoggedIn} showLinks={false} />
       {children}
-      <Footer />
+      {/* <Footer /> */}
     </div>
   );
 }

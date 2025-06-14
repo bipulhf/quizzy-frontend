@@ -25,14 +25,16 @@ const CreditsPageWrapper = ({
       <h1 className="text-3xl font-bold mb-4">Manage Your Credits</h1>
 
       <CreditBalance oldBalance={oldBalance} />
-
-      <div className="max-w-md mx-auto my-8">
-        <Elements stripe={stripePromise}>
-          <PaymentForm />
-        </Elements>
+      <div className="flex flex-col xl:flex-row gap-4">
+        <div className="flex-1">
+          <PaymentHistory paymentHistory={paymentHistory} />
+        </div>
+        <div className="">
+          <Elements stripe={stripePromise}>
+            <PaymentForm />
+          </Elements>
+        </div>
       </div>
-
-      <PaymentHistory paymentHistory={paymentHistory} />
     </div>
   );
 };

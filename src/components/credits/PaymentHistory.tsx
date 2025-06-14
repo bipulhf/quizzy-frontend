@@ -117,9 +117,7 @@ const PaymentHistory = ({
               <CreditCard className="h-4 w-4 text-yellow-primary" />
               <span className="text-sm font-medium">Total Spent</span>
             </div>
-            <p className="text-2xl font-bold mt-1">
-              ${(totalAmount / 100).toFixed(2)}
-            </p>
+            <p className="text-2xl font-bold mt-1">৳{totalAmount}</p>
           </div>
           <div className="p-4 bg-muted/50 rounded-lg">
             <div className="flex items-center gap-2">
@@ -198,15 +196,11 @@ const PaymentHistory = ({
                       </code>
                     </TableCell>
                     <TableCell>
-                      <span className="font-semibold">
-                        ${(payment.amount / 100).toFixed(2)}
-                      </span>
+                      <span className="font-semibold">৳{payment.amount}</span>
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-1">
-                        <span className="font-medium">
-                          {payment.amount / 100}
-                        </span>
+                        <span className="font-medium">{payment.amount}</span>
                         <span className="text-xs text-muted-foreground">
                           credits
                         </span>

@@ -27,10 +27,10 @@ const PaymentForm = () => {
   const [success, setSuccess] = useState(false);
 
   const creditPackages = [
-    { credits: 150, price: 150, popular: false, savings: 0 },
-    { credits: 250, price: 250, popular: true, savings: 0 },
-    { credits: 500, price: 500, popular: false, savings: 0 },
-    { credits: 1000, price: 1000, popular: false, savings: 0 },
+    { credits: 15, price: 150, popular: false, savings: 0 },
+    { credits: 25, price: 250, popular: true, savings: 0 },
+    { credits: 50, price: 500, popular: false, savings: 0 },
+    { credits: 100, price: 1000, popular: false, savings: 0 },
   ];
 
   const handleSubmit = async (event: React.FormEvent) => {
