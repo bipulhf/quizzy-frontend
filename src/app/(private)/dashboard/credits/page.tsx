@@ -1,31 +1,36 @@
-"use client";
+import CreditPageWrapper from "@/components/credits/CreditPageWrapper";
+import { getDashboardInfoAction } from "@/action/dashboard.action";
+import { DashboardInfoType, PaymentHistoryType } from "@/lib/types";
+import { getPaymentHistoryAction } from "@/action/payment.action";
 
-import React from 'react';
-import { loadStripe } from '@stripe/stripe-js';
-import { Elements } from '@stripe/react-stripe-js';
-import PaymentForm from '@/components/credits/PaymentForm';
-import CreditBalance from '@/components/credits/CreditBalance';
-import PaymentHistory from '@/components/credits/PaymentHistory';
+const CreditsPage = async () => {
+  const dashboardInfo = (await getDashboardInfoAction()) as {
+    success: boolean;
+    data: DashboardInfoType;
+    error?: string;
+  };
 
-// Make sure to add your publishable key to your .env.local file
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
+  const paymentHistory = (await getPaymentHistoryAction()) as {
+    success: boolean;
+    data: PaymentHistoryType[];
+    error?: string;
+  };
 
-const CreditsPage = () => {
-  return (
-    <div className="container mx-auto py-8">
-      <h1 className="text-3xl font-bold mb-4">Manage Your Credits</h1>
-      
-      <CreditBalance />
-
-      <p className="text-lg mb-8">You can purchase more credits below.</p>
-      <div className="max-w-md mx-auto">
-        <Elements stripe={stripePromise}>
-          <PaymentForm />
-        </Elements>
+  if (!dashboardInfo.success) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50/30">
+        <div className="container mx-auto p-4 md:p-6 lg:p-8 space-y-6">
+          <p className="text-red-500">{dashboardInfo.error}</p>
+        </div>
       </div>
+    );
+  }
 
-      <PaymentHistory />
-    </div>
+  return (
+    <CreditPageWrapper
+      oldBalance={dashboardInfo.data.credits}
+      paymentHistory={paymentHistory.data}
+    />
   );
 };
 

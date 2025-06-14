@@ -1,3 +1,12 @@
+export type PaymentHistoryType = {
+  id: number;
+  created_at: string;
+  completed_at: string | null;
+  amount: number;
+  credit_purchased: number;
+  status: string;
+};
+
 export type UploadType = {
   id: number;
   user_id: number;
