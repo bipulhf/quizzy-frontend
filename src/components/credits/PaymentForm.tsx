@@ -16,11 +16,12 @@ import {
   AlertCircle,
   CheckCircle,
 } from "lucide-react";
+import { createPaymentIntentAction } from "@/action/payment.action";
 
 const PaymentForm = () => {
   const stripe = useStripe();
   const elements = useElements();
-  const [amount, setAmount] = useState(150);
+  const [amount, setAmount] = useState(250);
   const [error, setError] = useState<string | null>(null);
   const [processing, setProcessing] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -45,25 +46,19 @@ const PaymentForm = () => {
 
     try {
       // Create payment intent on the server
-      const res = await fetch("/api/create-payment-intent", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ amount, currency: "bdt" }),
-      });
+      const res = await createPaymentIntentAction(amount);
 
-      if (!res.ok) {
+      if (!res.success) {
         throw new Error("Failed to create payment intent");
       }
 
-      const { clientSecret } = await res.json();
+      const { client_secret } = res.data;
 
       const cardElement = elements.getElement(CardElement);
 
       if (cardElement) {
         const { error, paymentIntent } = await stripe.confirmCardPayment(
-          clientSecret,
+          client_secret,
           {
             payment_method: {
               card: cardElement,
@@ -196,6 +191,7 @@ const PaymentForm = () => {
             <div className="p-4 border rounded-lg bg-background">
               <CardElement
                 options={{
+                  hidePostalCode: true,
                   style: {
                     base: {
                       fontSize: "16px",
