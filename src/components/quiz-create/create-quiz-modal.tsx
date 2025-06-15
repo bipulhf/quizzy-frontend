@@ -55,6 +55,8 @@ export function CreateQuizModal({
   const [quizType, setQuizType] = useState<"topic" | "page_range" | "">("");
   const [quizName, setQuizName] = useState("");
   const [topic, setTopic] = useState("");
+  const [topicInput, setTopicInput] = useState("");
+  const [topics, setTopics] = useState<string[]>([]);
   const [startPage, setStartPage] = useState("");
   const [endPage, setEndPage] = useState("");
   const [startDateTime, setStartDateTime] = useState("");
@@ -119,8 +121,8 @@ export function CreateQuizModal({
       newErrors.quizType = "Please select a quiz type";
     }
 
-    if (quizType === "topic" && !topic.trim()) {
-      newErrors.topic = "Topic is required";
+    if (quizType === "topic" && topics.length === 0) {
+      newErrors.topic = "At least one topic is required";
     }
 
     if (quizType === "page_range") {
@@ -220,6 +222,8 @@ export function CreateQuizModal({
       setQuizType("");
       setQuizName("");
       setTopic("");
+      setTopicInput("");
+      setTopics([]);
       setStartPage("");
       setEndPage("");
       setStartDateTime("");
@@ -253,6 +257,34 @@ export function CreateQuizModal({
   const getTotalPages = () => {
     const selectedPDFsData = getSelectedPDFsData();
     return selectedPDFsData.reduce((total, pdf) => total + pdf.pages, 0);
+  };
+
+  // Topic management functions
+  const addTopic = () => {
+    const trimmedTopic = topicInput.trim();
+    if (trimmedTopic && !topics.includes(trimmedTopic)) {
+      const newTopics = [...topics, trimmedTopic];
+      setTopics(newTopics);
+      setTopic(newTopics.join(":"));
+      setTopicInput("");
+      // Clear topic error when user adds a topic
+      if (errors.topic) {
+        setErrors((prev) => ({ ...prev, topic: "" }));
+      }
+    }
+  };
+
+  const removeTopic = (topicToRemove: string) => {
+    const newTopics = topics.filter((t) => t !== topicToRemove);
+    setTopics(newTopics);
+    setTopic(newTopics.join(":"));
+  };
+
+  const handleTopicInputKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      addTopic();
+    }
   };
 
   return (
@@ -343,62 +375,64 @@ export function CreateQuizModal({
             )}
 
             {/* PDF List */}
-            <ScrollArea className="max-h-[250px] p-3 border border-gray-200 rounded-md">
-              {filteredPDFs.length === 0 ? (
-                <div className="text-center py-8 text-gray-500">
-                  <FileText className="h-8 w-8 mx-auto mb-2 text-gray-300" />
-                  <p>No PDFs found matching your search</p>
-                  {searchQuery && (
-                    <Button
-                      variant="link"
-                      size="sm"
-                      onClick={() => setSearchQuery("")}
-                      className="mt-2"
-                    >
-                      Clear search
-                    </Button>
-                  )}
-                </div>
-              ) : (
-                <div className="space-y-2">
-                  {filteredPDFs.map((pdf) => (
-                    <div
-                      key={pdf.id}
-                      className={`flex items-center space-x-3 p-3 rounded-lg border transition-all duration-200 ${
-                        selectedPDFs.includes(pdf.id)
-                          ? "bg-blue-50 border-blue-200 shadow-sm"
-                          : "hover:bg-gray-50 border-gray-200"
-                      }`}
-                    >
-                      <Checkbox
-                        id={`pdf-${pdf.id}`}
-                        checked={selectedPDFs.includes(pdf.id)}
-                        onCheckedChange={() => handlePDFToggle(pdf.id)}
-                        disabled={isCreating}
-                      />
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1">
-                          <FileText className="h-4 w-4 text-blue-600 flex-shrink-0" />
-                          <span className="font-medium text-sm truncate">
-                            {pdf.pdf_name.length > 85
-                              ? pdf.pdf_name.substring(0, 85) + "..."
-                              : pdf.pdf_name}
-                          </span>
-                          {selectedPDFs.includes(pdf.id) && (
-                            <CheckCircle2 className="h-4 w-4 text-blue-600 flex-shrink-0" />
-                          )}
-                        </div>
-                        <div className="flex items-center gap-3 text-xs text-gray-500">
-                          <span>{pdf.pages} pages</span>
-                          <span>•</span>
-                          <span>{formatDateTime(pdf.created_at)}</span>
+            <div className="border border-gray-200 rounded-md max-h-[250px] overflow-hidden overflow-y-auto">
+              <ScrollArea className="h-[250px] p-3">
+                {filteredPDFs.length === 0 ? (
+                  <div className="text-center py-8 text-gray-500">
+                    <FileText className="h-8 w-8 mx-auto mb-2 text-gray-300" />
+                    <p>No PDFs found matching your search</p>
+                    {searchQuery && (
+                      <Button
+                        variant="link"
+                        size="sm"
+                        onClick={() => setSearchQuery("")}
+                        className="mt-2"
+                      >
+                        Clear search
+                      </Button>
+                    )}
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    {filteredPDFs.map((pdf) => (
+                      <div
+                        key={pdf.id}
+                        className={`flex items-center space-x-3 p-3 rounded-lg border transition-all duration-200 ${
+                          selectedPDFs.includes(pdf.id)
+                            ? "bg-blue-50 border-blue-200 shadow-sm"
+                            : "hover:bg-gray-50 border-gray-200"
+                        }`}
+                      >
+                        <Checkbox
+                          id={`pdf-${pdf.id}`}
+                          checked={selectedPDFs.includes(pdf.id)}
+                          onCheckedChange={() => handlePDFToggle(pdf.id)}
+                          disabled={isCreating}
+                        />
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-1">
+                            <FileText className="h-4 w-4 text-blue-600 flex-shrink-0" />
+                            <span className="font-medium text-sm truncate">
+                              {pdf.pdf_name.length > 85
+                                ? pdf.pdf_name.substring(0, 85) + "..."
+                                : pdf.pdf_name}
+                            </span>
+                            {selectedPDFs.includes(pdf.id) && (
+                              <CheckCircle2 className="h-4 w-4 text-blue-600 flex-shrink-0" />
+                            )}
+                          </div>
+                          <div className="flex items-center gap-3 text-xs text-gray-500">
+                            <span>{pdf.pages} pages</span>
+                            <span>•</span>
+                            <span>{formatDateTime(pdf.created_at)}</span>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </ScrollArea>
+                    ))}
+                  </div>
+                )}
+              </ScrollArea>
+            </div>
 
             <Separator />
 
@@ -491,22 +525,74 @@ export function CreateQuizModal({
 
             {/* Topic Input */}
             {quizType === "topic" && (
-              <div className="space-y-2 p-4 rounded-lg border border-gray-200">
+              <div className="space-y-3 p-4 rounded-lg border border-gray-200">
                 <Label htmlFor="topic" className="text-sm font-medium">
-                  Topic *
+                  Topics *
                 </Label>
-                <Input
-                  id="topic"
-                  value={topic}
-                  onChange={(e) => setTopic(e.target.value)}
-                  placeholder="e.g., Machine Learning Algorithms, Data Structures, etc."
-                  disabled={isCreating}
-                  className={errors.topic ? "border-red-500" : ""}
-                />
-                <p className="text-xs text-blue-700">
-                  AI will generate questions based on this topic from the
-                  selected PDFs
-                </p>
+
+                {/* Topic Input Field */}
+                <div className="flex gap-2">
+                  <Input
+                    id="topic"
+                    value={topicInput}
+                    onChange={(e) => setTopicInput(e.target.value)}
+                    onKeyPress={handleTopicInputKeyPress}
+                    placeholder="e.g., Machine Learning Algorithms"
+                    disabled={isCreating}
+                    className={`flex-1 ${errors.topic ? "border-red-500" : ""}`}
+                  />
+                  <Button
+                    type="button"
+                    onClick={addTopic}
+                    disabled={isCreating || !topicInput.trim()}
+                    size="sm"
+                    variant="outline"
+                  >
+                    Add
+                  </Button>
+                </div>
+
+                {/* Current Topics Display */}
+                {topics.length > 0 && (
+                  <div className="space-y-2">
+                    <Label className="text-xs font-medium text-gray-600">
+                      Added Topics ({topics.length})
+                    </Label>
+                    <div className="flex flex-wrap gap-2">
+                      {topics.map((topicItem, index) => (
+                        <Badge
+                          key={index}
+                          variant="secondary"
+                          className="gap-2 py-1 px-3 bg-green-100 text-green-800 hover:bg-green-200"
+                        >
+                          <span className="truncate max-w-[200px]">
+                            {topicItem}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => removeTopic(topicItem)}
+                            disabled={isCreating}
+                            className="hover:bg-green-300 rounded-full p-0.5 transition-colors"
+                          >
+                            <X className="h-3 w-3" />
+                          </button>
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                <div className="space-y-1">
+                  <p className="text-xs text-blue-700">
+                    AI will generate questions based on these topics from the
+                    selected PDFs
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    Press Enter or click "Add" to add a topic. Topics will be
+                    combined with ":" separator.
+                  </p>
+                </div>
+
                 {errors.topic && (
                   <p className="text-sm text-red-600 flex items-center gap-1">
                     <AlertCircle className="h-3 w-3" />

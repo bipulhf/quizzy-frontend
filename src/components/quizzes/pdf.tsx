@@ -110,21 +110,21 @@ export const QuizPdfDocument: React.FC<QuizPdfProps> = ({ quiz }) => {
 
         {/* Questions */}
         {quiz.questions.map((q, idx) => (
-          <View key={q.id} style={styles.questionBlock}>
+          <View key={q.id} style={styles.questionBlock} wrap={false}>
             <Text style={styles.questionText}>
               {idx + 1}. {q.text}
             </Text>
             <Text style={styles.optionText}>
-              <Text style={styles.optionBullet}>A.</Text> {q.option_1}
+              <Text style={styles.optionBullet}></Text> {q.option_1}
             </Text>
             <Text style={styles.optionText}>
-              <Text style={styles.optionBullet}>B.</Text> {q.option_2}
+              <Text style={styles.optionBullet}></Text> {q.option_2}
             </Text>
             <Text style={styles.optionText}>
-              <Text style={styles.optionBullet}>C.</Text> {q.option_3}
+              <Text style={styles.optionBullet}></Text> {q.option_3}
             </Text>
             <Text style={styles.optionText}>
-              <Text style={styles.optionBullet}>D.</Text> {q.option_4}
+              <Text style={styles.optionBullet}></Text> {q.option_4}
             </Text>
           </View>
         ))}
