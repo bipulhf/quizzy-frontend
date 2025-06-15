@@ -8,8 +8,10 @@ export default async function RootLayout({
   children: React.ReactNode;
 }) {
   const cookieStore = await cookies();
-  const isLoggedIn = cookieStore.get("token") ? true : false;
+  const isLoggedIn = cookieStore.get("token")?.value ? true : false;
+
   if (!isLoggedIn) redirect("/signin");
+
   return (
     <div className="">
       <Navbar isLoggedIn={isLoggedIn} showLinks={false} />

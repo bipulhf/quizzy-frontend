@@ -1,7 +1,6 @@
 import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
 import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
 
 export default async function RootLayout({
   children,
@@ -9,9 +8,7 @@ export default async function RootLayout({
   children: React.ReactNode;
 }) {
   const cookieStore = await cookies();
-  const isLoggedIn = cookieStore.get("token") ? true : false;
-
-  if (isLoggedIn) redirect("/dashboard");
+  const isLoggedIn = cookieStore.get("token")?.value ? true : false;
 
   return (
     <div className="">
