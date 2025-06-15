@@ -110,7 +110,7 @@ export const Navbar = ({
                     method: "GET",
                   });
                   toast.success("Logged out");
-                  router.push("/signin");
+                  window.location.href = "/signin";
                 }}
                 className="hover:text-primary transition-all duration-200 ml-10"
               >
@@ -196,7 +196,7 @@ export const Navbar = ({
                       method: "GET",
                     });
                     toast.success("Logged out");
-                    router.push("/signin");
+                    window.location.href = "/signin";
                   }}
                 >
                   Logout
