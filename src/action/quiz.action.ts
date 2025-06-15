@@ -41,8 +41,8 @@ export async function createQuizAction({
       body: JSON.stringify({
         name,
         retake,
-        start_time: new Date(new Date(start_time).toUTCString()).toISOString(),
-        end_time: new Date(new Date(end_time).toUTCString()).toISOString(),
+        start_time,
+        end_time,
         quiz_type,
         topic: topic ? topic : null,
         start_page: start_page ? Number(start_page) : null,
@@ -261,8 +261,8 @@ export async function updateQuizAction({
       body: JSON.stringify({
         name,
         retake,
-        start_time: new Date(new Date(start_time).toUTCString()).toISOString(),
-        end_time: new Date(new Date(end_time).toUTCString()).toISOString(),
+        start_time,
+        end_time,
         quiz_type,
         topic: topic ? topic : null,
         start_page: start_page ? Number(start_page) : null,
