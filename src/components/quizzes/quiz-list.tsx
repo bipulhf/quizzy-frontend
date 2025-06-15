@@ -12,6 +12,7 @@ import {
   Copy,
   Trash2,
   BarChart3,
+  Download,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -23,8 +24,14 @@ import {
 import { QuizType } from "@/lib/types";
 import { formatDateTime } from "@/utils/date";
 import { toast } from "sonner";
-import { createQuizAction, deleteQuizAction } from "@/action/quiz.action";
+import {
+  createQuizAction,
+  deleteQuizAction,
+  getQuizAction,
+} from "@/action/quiz.action";
 import { useRouter } from "next/navigation";
+import { pdf } from "@react-pdf/renderer";
+import { QuizPdfDocument } from "./pdf";
 
 export function QuizList({ quizzes }: { quizzes: QuizType[] }) {
   const router = useRouter();
@@ -200,6 +207,33 @@ export function QuizList({ quizzes }: { quizzes: QuizType[] }) {
                       >
                         <BarChart3 className="h-4 w-4 mr-2" />
                         Analytics
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={async () => {
+                          toast.loading("Downloading PDF...");
+                          const data = await getQuizAction(quiz.id.toString());
+                          if (!data.success) {
+                            toast.dismiss();
+                            toast.error(data.error || "Failed to fetch quiz");
+                            return;
+                          }
+                          const blob = await pdf(
+                            <QuizPdfDocument quiz={data.data} />
+                          ).toBlob();
+                          const url = URL.createObjectURL(blob);
+
+                          const link = document.createElement("a");
+                          link.href = url;
+                          link.download = `${quiz.name}.pdf`;
+                          link.click();
+
+                          URL.revokeObjectURL(url);
+                          toast.dismiss();
+                          toast.success("PDF downloaded successfully");
+                        }}
+                      >
+                        <Download className="h-4 w-4 mr-2" />
+                        Download as PDF
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem

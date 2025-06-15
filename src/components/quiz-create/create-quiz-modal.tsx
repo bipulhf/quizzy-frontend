@@ -380,7 +380,9 @@ export function CreateQuizModal({
                         <div className="flex items-center gap-2 mb-1">
                           <FileText className="h-4 w-4 text-blue-600 flex-shrink-0" />
                           <span className="font-medium text-sm truncate">
-                            {pdf.pdf_name}
+                            {pdf.pdf_name.length > 85
+                              ? pdf.pdf_name.substring(0, 85) + "..."
+                              : pdf.pdf_name}
                           </span>
                           {selectedPDFs.includes(pdf.id) && (
                             <CheckCircle2 className="h-4 w-4 text-blue-600 flex-shrink-0" />

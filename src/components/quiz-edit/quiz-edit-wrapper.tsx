@@ -23,6 +23,7 @@ export function QuizEditWrapper({
   );
   const [isLoading, setIsLoading] = useState(false);
 
+  console.log(initialQuizData);
   // Update quiz settings
   const updateQuizSettings = (updates: Partial<QuizType>) => {
     setQuizData((prev) => ({ ...prev, ...updates }));
