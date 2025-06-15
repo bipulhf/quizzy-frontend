@@ -94,7 +94,7 @@ const PaymentForm = () => {
               Payment Successful!
             </h3>
             <p className="text-green-700 mb-4">
-              Your account has been credited with {amount} credits.
+              Your account has been credited with {amount / 10} credits.
             </p>
             <p className="text-sm text-green-600">Redirecting...</p>
           </div>
