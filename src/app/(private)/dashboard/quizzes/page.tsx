@@ -49,8 +49,6 @@ export default function QuizzesPage() {
     setFilteredQuizzes(filtered);
   };
 
-  console.log(quizzes);
-
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50/30">

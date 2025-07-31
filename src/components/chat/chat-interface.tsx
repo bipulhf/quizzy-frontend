@@ -5,13 +5,13 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
-import { Send, File, X, Paperclip, Loader2 } from "lucide-react"; // Added Paperclip and Loader2 icons
+import { Send, File, X, Hash, Loader2 } from "lucide-react";
 import { useChatStore } from "@/hooks/use-chat-store";
 import { ChatMessage } from "./chat-message";
-import { PdfReferenceModal } from "./pdf-reference-modal";
+import { PdfInlineSelector } from "./pdf-inline-selector";
 import { listUploadsAction } from "@/action/uploads.action";
 import { UploadType } from "@/lib/types";
-import { PdfReference } from "@/hooks/use-chat-store"; // Import PdfReference
+import { PdfReference } from "@/hooks/use-chat-store";
 import { AI_URL } from "@/lib/data";
 
 interface ChatInterfaceProps {
@@ -21,15 +21,17 @@ interface ChatInterfaceProps {
 export function ChatInterface({ chatId }: ChatInterfaceProps) {
   const [message, setMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [showPdfModal, setShowPdfModal] = useState(false);
-  // const [pdfReferences, setPdfReferences] = useState<PdfReference[]>([]); // Ensured local state is removed/commented
-  const [availablePdfs, setAvailablePdfs] = useState<any[]>([]);
+  const [showPdfSelector, setShowPdfSelector] = useState(false);
+  const [pdfSearchTerm, setPdfSearchTerm] = useState("");
+  const [selectorPosition, setSelectorPosition] = useState({ top: 0, left: 0 });
+  const [availablePdfs, setAvailablePdfs] = useState<UploadType[]>([]);
+  const [atSymbolPosition, setAtSymbolPosition] = useState<number>(-1);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const scrollAreaRef = useRef<HTMLDivElement>(null); // Ref for ScrollArea component
+  const scrollAreaRef = useRef<HTMLDivElement>(null);
 
   const { chats, addMessage, updateMessage, updateChatPdfReferences } =
-    useChatStore(); // Added updateChatPdfReferences
+    useChatStore();
   const currentChat = chats.find((chat) => chat.id === chatId);
 
   useEffect(() => {
@@ -84,14 +86,50 @@ export function ChatInterface({ chatId }: ChatInterfaceProps) {
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && !e.shiftKey) {
+    if (e.key === "Enter" && !e.shiftKey && !showPdfSelector) {
       e.preventDefault();
       handleSendMessage();
     }
+  };
 
-    // Handle @ symbol for PDF referencing
-    if (e.key === "@") {
-      setShowPdfModal(true);
+  const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const value = e.target.value;
+    const cursorPosition = e.target.selectionStart;
+
+    setMessage(value);
+
+    // Check for @ symbol
+    const atIndex = value.lastIndexOf("@", cursorPosition - 1);
+    if (atIndex !== -1 && (atIndex === 0 || value[atIndex - 1] === " ")) {
+      const searchTerm = value.substring(atIndex + 1, cursorPosition);
+      if (!searchTerm.includes(" ")) {
+        // Show PDF selector
+        setPdfSearchTerm(searchTerm);
+        setAtSymbolPosition(atIndex);
+        setShowPdfSelector(true);
+
+        // Calculate position for dropdown
+        if (textareaRef.current) {
+          const rect = textareaRef.current.getBoundingClientRect();
+          const viewportHeight = window.innerHeight;
+          const dropdownHeight = 200; // Approximate height
+
+          // Position above input if not enough space below
+          const shouldPositionAbove =
+            rect.bottom + dropdownHeight > viewportHeight;
+
+          setSelectorPosition({
+            top: shouldPositionAbove
+              ? rect.top - dropdownHeight - 8
+              : rect.bottom + 4,
+            left: Math.max(rect.left, 16), // Ensure it doesn't go off-screen left
+          });
+        }
+      } else {
+        setShowPdfSelector(false);
+      }
+    } else {
+      setShowPdfSelector(false);
     }
   };
 
@@ -100,11 +138,35 @@ export function ChatInterface({ chatId }: ChatInterfaceProps) {
       id: pdf.pdf_id,
       name: pdf.pdf_name,
     };
+
+    // Add to chat references
     const currentReferences = currentChat?.pdfReferences || [];
     if (!currentReferences.find((ref) => ref.id === reference.id)) {
       updateChatPdfReferences(chatId, [...currentReferences, reference]);
     }
-    setShowPdfModal(false);
+
+    // Replace @searchTerm with the PDF name in the message
+    if (atSymbolPosition !== -1) {
+      const beforeAt = message.substring(0, atSymbolPosition);
+      const afterSearch = message.substring(
+        atSymbolPosition + 1 + pdfSearchTerm.length
+      );
+      const newMessage = `${beforeAt}@${pdf.pdf_name}${afterSearch}`;
+      setMessage(newMessage);
+    }
+
+    setShowPdfSelector(false);
+    setPdfSearchTerm("");
+    setAtSymbolPosition(-1);
+
+    // Focus back to textarea
+    textareaRef.current?.focus();
+  };
+
+  const closePdfSelector = () => {
+    setShowPdfSelector(false);
+    setPdfSearchTerm("");
+    setAtSymbolPosition(-1);
   };
 
   const removePdfReference = (id: string) => {
@@ -276,40 +338,38 @@ export function ChatInterface({ chatId }: ChatInterfaceProps) {
   }; // This is the correct end of handleSendMessage
 
   return (
-    <div className="flex flex-col flex-1 bg-gray-50 overflow-hidden p-4 gap-3">
-      {" "}
-      {/* Changed h-full to h-screen and added bg color */}
+    <div className="flex flex-col h-full bg-white">
       {/* Chat Header */}
-      <div className="p-3 border-b border-gray-200 bg-white shadow-sm sticky top-0 z-10">
-        {/* Chat Title Row */}
-        <div className="flex justify-between items-center mb-2">
-          <h2 className="font-semibold text-lg text-gray-800">
-            {currentChat?.title || "Chat"}
+      <div className="flex-shrink-0 p-4 border-b border-gray-200 bg-white">
+        <div className="flex justify-between items-center mb-3">
+          <h2 className="font-semibold text-xl text-gray-900">
+            {currentChat?.title || "New Chat"}
           </h2>
-          {/* You can add other elements here if they should be aligned with the title */}
         </div>
 
         {/* PDF References Section */}
         {currentChat?.pdfReferences && currentChat.pdfReferences.length > 0 && (
-          <div className="mb-1">
-            <h3 className="text-xs font-medium text-gray-500 mb-1">
-              Active PDF References:
+          <div>
+            <h3 className="text-xs font-medium text-gray-500 mb-2">
+              Referenced PDFs:
             </h3>
-            <div className="flex flex-wrap gap-2 mt-1">
+            <div className="flex flex-wrap gap-2">
               {currentChat.pdfReferences.map((ref) => (
                 <Badge
                   key={ref.id}
                   variant="outline"
-                  className="flex items-center gap-1.5 py-1 px-2 border-blue-500 text-blue-700 bg-blue-50"
+                  className="flex items-center gap-1.5 py-1.5 px-3 border-blue-200 text-blue-700 bg-blue-50 hover:bg-blue-100 transition-colors"
                 >
                   <File className="w-3.5 h-3.5" />
-                  <span className="text-xs font-medium">{ref.name}</span>
+                  <span className="text-xs font-medium max-w-32 truncate">
+                    {ref.name}
+                  </span>
                   <button
                     onClick={() => removePdfReference(ref.id)}
-                    className="ml-1 p-0.5 rounded-full hover:bg-blue-200"
+                    className="ml-1 p-0.5 rounded-full hover:bg-blue-200 transition-colors"
                     aria-label={`Remove ${ref.name} reference`}
                   >
-                    <X className="w-3.5 h-3.5" />
+                    <X className="w-3 h-3" />
                   </button>
                 </Badge>
               ))}
@@ -317,55 +377,76 @@ export function ChatInterface({ chatId }: ChatInterfaceProps) {
           </div>
         )}
       </div>
+
       {/* Messages */}
-      <ScrollArea
-        className="flex-1 p-4 bg-gray-100 min-h-0 rounded-md"
-        ref={scrollAreaRef}
-      >
-        {" "}
-        {/* Added bg color to message area */}
-        <div className="space-y-4">
+      <ScrollArea className="flex-1 px-4 py-2" ref={scrollAreaRef}>
+        <div className="space-y-4 max-w-4xl mx-auto">
           {currentChat?.messages.map((msg) => (
             <ChatMessage key={msg.id} message={msg} />
           ))}
+          {currentChat?.messages.length === 0 && (
+            <div className="flex items-center justify-center h-full text-center py-12">
+              <div className="text-gray-500">
+                <div className="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
+                  <File className="w-8 h-8 text-gray-400" />
+                </div>
+                <h3 className="text-lg font-medium text-gray-900 mb-2">
+                  Start a conversation
+                </h3>
+                <p className="text-sm text-gray-500 max-w-sm">
+                  Ask questions about your PDFs or have a general conversation.
+                  Use @ to reference specific documents.
+                </p>
+              </div>
+            </div>
+          )}
         </div>
         <div ref={messagesEndRef} />
       </ScrollArea>
       {/* Input Area */}
-      <div className="p-3 border-t border-gray-200 bg-white sticky bottom-0 z-10 shadow-t">
-        {" "}
-        {/* Adjusted padding, sticky, shadow */}
-        <div className="flex items-end gap-2">
-          {" "}
-          {/* items-end for better alignment with multi-line textarea */}
+      <div className="p-4 border-t border-gray-200 bg-white sticky bottom-0 z-10 shadow-sm">
+        <div className="flex items-end gap-3">
           <Button
             variant="outline"
             size="icon"
-            onClick={() => setShowPdfModal(true)}
-            className="flex-shrink-0 border-gray-300 hover:bg-gray-100"
-            aria-label="Attach PDF"
-          >
-            <Paperclip className="w-5 h-5 text-gray-600" />
-          </Button>
-          <Textarea
-            ref={textareaRef}
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            onKeyPress={handleKeyPress}
-            placeholder="Type your message... (Use @ or click paperclip to reference PDFs)"
-            className="flex-1 resize-none border-gray-300 focus:ring-blue-500 focus:border-blue-500 min-h-[40px] max-h-[120px] text-sm p-2"
-            rows={1} // Start with 1 row, auto-expands with content
-            onInput={(e) => {
-              const target = e.target as HTMLTextAreaElement;
-              target.style.height = "inherit";
-              target.style.height = `${target.scrollHeight}px`;
+            onClick={() => {
+              setMessage(message + "@");
+              textareaRef.current?.focus();
             }}
-          />
+            className="flex-shrink-0 border-gray-300 hover:bg-gray-100"
+            aria-label="Reference PDF"
+            title="Reference PDF (@)"
+          >
+            <Hash className="w-4 h-4 text-gray-600" />
+          </Button>
+          <div className="flex-1 relative">
+            <Textarea
+              ref={textareaRef}
+              value={message}
+              onChange={handleInputChange}
+              onKeyPress={handleKeyPress}
+              placeholder={
+                currentChat?.pdfReferences &&
+                currentChat.pdfReferences.length > 0
+                  ? `Ask about ${currentChat.pdfReferences
+                      .map((ref) => ref.name)
+                      .join(", ")}... Use @ for more PDFs`
+                  : "Type your message... Use @ to reference PDFs"
+              }
+              className="resize-none border-gray-300 focus:ring-blue-500 focus:border-blue-500 min-h-[44px] max-h-[120px] text-sm"
+              rows={1}
+              onInput={(e) => {
+                const target = e.target as HTMLTextAreaElement;
+                target.style.height = "inherit";
+                target.style.height = `${target.scrollHeight}px`;
+              }}
+            />
+          </div>
           <Button
             onClick={handleSendMessage}
             disabled={!message.trim() || isLoading}
             size="icon"
-            className="flex-shrink-0 bg-blue-600 hover:bg-blue-700 text-white rounded-md w-10 h-10"
+            className="flex-shrink-0 bg-blue-600 hover:bg-blue-700 text-white rounded-md w-11 h-11"
             aria-label="Send message"
           >
             {isLoading ? (
@@ -376,12 +457,15 @@ export function ChatInterface({ chatId }: ChatInterfaceProps) {
           </Button>
         </div>
       </div>
-      {/* PDF Reference Modal */}
-      <PdfReferenceModal
-        isOpen={showPdfModal}
-        onClose={() => setShowPdfModal(false)}
+
+      {/* PDF Inline Selector */}
+      <PdfInlineSelector
+        isOpen={showPdfSelector}
+        searchTerm={pdfSearchTerm}
         pdfs={availablePdfs}
         onSelect={handlePdfSelect}
+        onClose={closePdfSelector}
+        position={selectorPosition}
       />
     </div>
   );

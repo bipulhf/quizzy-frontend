@@ -375,7 +375,7 @@ export function CreateQuizModal({
             )}
 
             {/* PDF List */}
-            <div className="border border-gray-200 rounded-md max-h-[250px] overflow-hidden overflow-y-auto">
+            <div className="border border-gray-200 rounded-md max-h-[250px] overflow-hidden">
               <ScrollArea className="h-[250px] p-3">
                 {filteredPDFs.length === 0 ? (
                   <div className="text-center py-8 text-gray-500">

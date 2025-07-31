@@ -28,31 +28,40 @@ export function ChatSidebar({
 
   return (
     <ScrollArea className="flex-1">
-      <div className="p-2 space-y-2">
+      <div className="p-3 space-y-2">
         {chats.length === 0 ? (
-          <div className="text-center text-gray-500 py-8">
-            <MessageSquare className="w-8 h-8 mx-auto mb-2 opacity-50" />
-            <p className="text-sm">No chats yet</p>
+          <div className="text-center text-gray-500 py-12">
+            <MessageSquare className="w-12 h-12 mx-auto mb-3 opacity-30" />
+            <p className="text-sm font-medium">No chats yet</p>
+            <p className="text-xs text-gray-400 mt-1">
+              Create your first chat to get started
+            </p>
           </div>
         ) : (
           chats.map((chat) => (
             <div
               key={chat.id}
-              className={`group cursor-pointer rounded-lg p-3 border transition-colors ${
+              className={`group cursor-pointer rounded-lg p-3 border transition-all duration-200 ${
                 activeChat?.id === chat.id
-                  ? "bg-blue-50 border-blue-200"
-                  : "bg-white border-gray-200 hover:bg-gray-50"
+                  ? "bg-blue-50 border-blue-200 shadow-sm"
+                  : "bg-white border-gray-200 hover:bg-gray-50 hover:border-gray-300"
               }`}
               onClick={() => onSelectChat(chat)}
             >
               <div className="flex items-start justify-between">
                 <div className="flex-1 min-w-0">
-                  <h3 className="font-medium text-sm text-gray-900 truncate">
+                  <h3 className="font-medium text-sm text-gray-900 truncate mb-1">
                     {chat.title}
                   </h3>
-                  <p className="text-xs text-gray-500 mt-1">
-                    {chat.messages.length} messages
-                  </p>
+                  <div className="flex items-center gap-2 text-xs text-gray-500">
+                    <span>{chat.messages.length} messages</span>
+                    {chat.pdfReferences && chat.pdfReferences.length > 0 && (
+                      <>
+                        <span>•</span>
+                        <span>{chat.pdfReferences.length} PDFs</span>
+                      </>
+                    )}
+                  </div>
                   <p className="text-xs text-gray-400 mt-1">
                     {new Date(chat.updatedAt).toLocaleDateString()}
                   </p>
@@ -60,10 +69,10 @@ export function ChatSidebar({
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="opacity-0 group-hover:opacity-100 transition-opacity p-1 h-auto"
+                  className="opacity-0 group-hover:opacity-100 transition-opacity p-1.5 h-auto hover:bg-red-50"
                   onClick={(e) => handleDeleteChat(e, chat.id)}
                 >
-                  <Trash2 className="w-3 h-3 text-gray-500 hover:text-red-500" />
+                  <Trash2 className="w-3.5 h-3.5 text-gray-400 hover:text-red-500" />
                 </Button>
               </div>
             </div>
