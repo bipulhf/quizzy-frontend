@@ -85,8 +85,14 @@ export function ChatInterface({ chatId }: ChatInterfaceProps) {
     }
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && !e.shiftKey && !showPdfSelector) {
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    // Don't handle any keys if PDF selector is open - let it handle them
+    if (showPdfSelector) {
+      return;
+    }
+
+    // Handle Enter for sending message
+    if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleSendMessage();
     }
@@ -112,17 +118,25 @@ export function ChatInterface({ chatId }: ChatInterfaceProps) {
         if (textareaRef.current) {
           const rect = textareaRef.current.getBoundingClientRect();
           const viewportHeight = window.innerHeight;
-          const dropdownHeight = 200; // Approximate height
+          const viewportWidth = window.innerWidth;
+          const dropdownHeight = 300; // Approximate height
+          const dropdownWidth = 320; // Width of dropdown
 
           // Position above input if not enough space below
           const shouldPositionAbove =
-            rect.bottom + dropdownHeight > viewportHeight;
+            rect.bottom + dropdownHeight > viewportHeight - 20;
+
+          // Ensure dropdown doesn't go off-screen horizontally
+          const leftPosition = Math.min(
+            Math.max(rect.left, 16), // Don't go off left edge
+            viewportWidth - dropdownWidth - 16 // Don't go off right edge
+          );
 
           setSelectorPosition({
             top: shouldPositionAbove
-              ? rect.top - dropdownHeight - 8
+              ? Math.max(rect.top - dropdownHeight - 8, 16) // Don't go off top
               : rect.bottom + 4,
-            left: Math.max(rect.left, 16), // Ensure it doesn't go off-screen left
+            left: leftPosition,
           });
         }
       } else {
@@ -379,8 +393,8 @@ export function ChatInterface({ chatId }: ChatInterfaceProps) {
       </div>
 
       {/* Messages */}
-      <ScrollArea className="flex-1 px-4 py-2" ref={scrollAreaRef}>
-        <div className="space-y-4 max-w-4xl mx-auto">
+      <ScrollArea className="flex-1 h-[600px] px-4 py-2" ref={scrollAreaRef}>
+        <div className="space-y-4 mx-auto">
           {currentChat?.messages.map((msg) => (
             <ChatMessage key={msg.id} message={msg} />
           ))}
@@ -424,7 +438,7 @@ export function ChatInterface({ chatId }: ChatInterfaceProps) {
               ref={textareaRef}
               value={message}
               onChange={handleInputChange}
-              onKeyPress={handleKeyPress}
+              onKeyDown={handleKeyDown}
               placeholder={
                 currentChat?.pdfReferences &&
                 currentChat.pdfReferences.length > 0

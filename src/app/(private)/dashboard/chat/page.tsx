@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { ChatInterface } from "@/components/chat/chat-interface";
 import { ChatSidebar } from "@/components/chat/chat-sidebar";
 import { Button } from "@/components/ui/button";
@@ -21,7 +21,7 @@ export default function ChatPage() {
   }, [loadChatsFromStorage]);
 
   return (
-    <div className="flex h-full bg-gray-50">
+    <div className="flex h-[calc(100vh-65px)] overflow-hidden bg-gray-50">
       {/* Sidebar */}
       <div className="w-80 bg-white border-r border-gray-200 flex flex-col shadow-sm">
         <div className="p-4 border-b border-gray-200">

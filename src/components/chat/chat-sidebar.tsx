@@ -50,7 +50,7 @@ export function ChatSidebar({
             >
               <div className="flex items-start justify-between">
                 <div className="flex-1 min-w-0">
-                  <h3 className="font-medium text-sm text-gray-900 truncate mb-1">
+                  <h3 className="w-60 trucate font-medium text-sm text-gray-900 truncate mb-1">
                     {chat.title}
                   </h3>
                   <div className="flex items-center gap-2 text-xs text-gray-500">
